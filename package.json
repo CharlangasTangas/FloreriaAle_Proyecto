@@ -1,0 +1,14 @@
+{
+  "name": "pos-system",
+  "version": "1.0.0",
+  "description": "Point of Sale System",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/css/tailwind.css -o ./assets/css/tailwind.css",
+    "watch:css": "tailwindcss -i ./src/css/tailwind.css -o ./assets/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.23",
+    "tailwindcss": "^3.3.2"
+  }
+}
