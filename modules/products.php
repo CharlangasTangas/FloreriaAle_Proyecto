@@ -34,20 +34,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="flex flex-col gap-6">
     <div>
-        <h2 class="text-2xl font-bold tracking-tight">Product Management</h2>
-        <p class="text-gray-500">Manage your inventory, pricing, and stock levels.</p>
+        <h2 class="text-2xl font-bold tracking-tight">Administrador de Productos</h2>
+        <p class="text-gray-500">Administra tu inventario, precio y stock.</p>
     </div>
 
     <div class="rounded-lg border bg-white shadow">
         <div class="flex flex-row items-center justify-between p-4 pb-2">
             <div>
-                <h3 class="font-medium">Products</h3>
-                <p class="text-sm text-gray-500">View and manage your product inventory.</p>
+                <h3 class="font-medium">Productos</h3>
+                <p class="text-sm text-gray-500">Administra tu inventario de productos.<p>
             </div>
+
+            <!-- Botón par abrir el modal de Agregar Productos -->
             <button type="button" class="inline-flex items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600" onclick="document.getElementById('add-product-modal').classList.remove('hidden')">
                 <i class="fas fa-plus-circle mr-2"></i>
-                Add Product
+                Agregar Producto
             </button>
+
         </div>
         <div class="p-4">
             <div class="mb-4 flex items-center gap-2">
@@ -66,6 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <th class="p-3 text-right font-medium">Actions</th>
                         </tr>
                     </thead>
+
+                    <!-- El foreach se encarga de cargar los productos uno por uno y colocarlos en forma de tabla-->
                     <tbody>
                         <?php foreach ($products as $product): ?>
                         <tr class="border-b">
@@ -95,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
+
                 </table>
             </div>
         </div>

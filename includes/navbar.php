@@ -11,7 +11,7 @@
                     </svg>
                 </button>
                 <a href="index.php" class="text-xl font-bold flex items-center lg:ml-2.5">
-                    <span class="self-center whitespace-nowrap">POS System</span>
+                    <span class="self-center whitespace-nowrap">FlorerÍa "Ale"</span>
                 </a>
             </div>
             <div class="flex items-center">
