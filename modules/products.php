@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </tr>
                     </thead>
 
-                    <!-- El foreach se encarga de cargar los productos uno por uno y colocarlos en forma de tabla-->
+                    <!-- El foreach se encarga de cargar los productos del arreglo "$products" uno por uno y colocarlos en forma de tabla-->
                     <tbody>
                         <?php foreach ($products as $product): ?>
                         <tr class="border-b">
