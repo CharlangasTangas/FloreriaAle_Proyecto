@@ -1,5 +1,6 @@
 <?php
 // Sample user data - in a real application, this would come from a database
+//Este es una prueba pra ver cambios
 $users = [
     ['id' => 1, 'name' => 'John Smith', 'email' => 'john.smith@example.com', 'role' => 'Admin', 'status' => 'Active'],
     ['id' => 2, 'name' => 'Sarah Johnson', 'email' => 'sarah.johnson@example.com', 'role' => 'Cashier', 'status' => 'Active'],
