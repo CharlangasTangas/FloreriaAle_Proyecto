@@ -1,19 +1,12 @@
 <?php
-
-session_start();
-include 'config\connection.php'; 
-
-if (!isset($_SESSION['usuario'])) {
-    include 'modules/login.php';
-    exit; 
-}
+// Include necessary files
 include 'includes/header.php';
 include 'includes/navbar.php';
 include 'includes/sidebar.php';
 
 // Determine which page to load
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-$valid_pages = ['dashboard', 'sales', 'invoices', 'purchases', 'products', 'users', 'customer','supplier', 'test'];
+$valid_pages = ['dashboard', 'sales', 'invoices', 'purchases', 'products', 'users', 'test'];
 
 if (!in_array($page, $valid_pages)) {
     $page = 'dashboard';
