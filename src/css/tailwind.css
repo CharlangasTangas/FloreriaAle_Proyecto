@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer components {
+  /* Your existing component classes */
+  
+  /* ... */
+}
+
+@layer utilities {
+  /* Animation utilities */
+  .animate-fade-in-down {
+    animation: fade-in-down 0.3s ease-in-out forwards;
+  }
+  
+  .animate-fade-out-up {
+    animation: fade-out-up 0.3s ease-in-out forwards;
+  }
+  
+  @keyframes fade-in-down {
+    0% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fade-out-up {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+}
