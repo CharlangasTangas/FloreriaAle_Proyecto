@@ -51,6 +51,6 @@
                 left: 0;
             }
         }
-    </style>
+    </style>   
 </head>
 <body class="bg-gray-50 text-gray-900">
