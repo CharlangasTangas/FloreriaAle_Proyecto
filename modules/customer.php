@@ -3,24 +3,18 @@ include 'config\connection.php';
 
 $mensaje = '';
 $mensaje_tipo = 'success';
-$condicion = '1'; // Valor por defecto para nuevo cliente
+$condicion = '1';
 
-// Leer mensaje por GET (para mostrar después de redirección)
 if (isset($_GET['msg'])) {
     $mensaje = $_GET['msg'];
     $mensaje_tipo = isset($_GET['type']) && $_GET['type'] === 'error' ? 'error' : 'success';
 }
 
-// Variables para el formulario de edición
-$cliente_edit = null;
-
-// Obtener el próximo ID AUTO_INCREMENT para mostrarlo en el formulario de registro
 $next_id = '';
 $res_next_id = $connection->query("SHOW TABLE STATUS LIKE 'Cliente'");
 if ($res_next_id && $row_next_id = $res_next_id->fetch_assoc()) {
     $next_id = $row_next_id['Auto_increment'];
 }
-
 
 $accion = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -28,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 } elseif (isset($_GET['action'])) {
     $accion = $_GET['action'];
 }
-
 
 switch ($accion) {
     case 'add_cliente':
@@ -71,7 +64,6 @@ switch ($accion) {
         break;
 
     case 'edit_cliente':
-        // Validar que RFC y email no existan en otro cliente
         $sql_check = "SELECT COUNT(*) as total FROM Cliente WHERE (RFC = ? OR email = ?) AND idCliente != ?";
         $stmt_check = $connection->prepare($sql_check);
         $stmt_check->bind_param("ssi", $_POST['rfc'], $_POST['email'], $_POST['idCliente']);
@@ -132,22 +124,6 @@ switch ($accion) {
             exit;
         }
         break;
-
-    case 'edit':
-        if (isset($_GET['id'])) {
-            $id = intval($_GET['id']);
-            $sql = "SELECT * FROM Cliente WHERE idCliente=?";
-            $stmt = $connection->prepare($sql);
-            $stmt->bind_param("i", $id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $cliente_edit = $result->fetch_assoc();
-        }
-        break;
-
-    default:
-
-        break;
 }
 
 // Obtener clientes activos
@@ -159,283 +135,279 @@ $result_inactivos = $connection->query("SELECT * FROM Cliente WHERE condicion='0
 $clientes_inactivos = $result_inactivos->fetch_all(MYSQLI_ASSOC);
 ?>
 
-
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Clientes</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-
-<body class="bg-gray-100 p-6">
-    <?php if ($mensaje): ?>
-        <script>
-            Swal.fire({
-                icon: "<?php echo ($mensaje_tipo === 'error') ? 'error' : 'success'; ?>",
-                title: "<?php echo addslashes($mensaje); ?>",
-                confirmButtonText: 'Aceptar'
-            });
-            // Limpiar la URL para que no se repita el mensaje al recargar
+<?php if ($mensaje): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            alert("<?php echo addslashes($mensaje); ?>");
             if (window.location.search.includes('msg=')) {
                 const url = new URL(window.location.href);
                 url.searchParams.delete('msg');
                 url.searchParams.delete('type');
                 window.history.replaceState({}, document.title, url.pathname + url.search);
             }
-        </script>
-    <?php endif; ?>
-    <div class="container mx-auto">
-        <h1 class="text-2xl font-bold mb-4">Gestión de Clientes</h1>
-        <!-- Botón para mostrar formulario agregar cliente -->
-        <?php if (!$cliente_edit): ?>
-            <button onclick="document.getElementById('add-client-form').classList.toggle('hidden')"
-                class="mb-4 bg-blue-500 text-white px-4 py-2 rounded">Agregar Cliente</button>
-        <?php endif; ?>
+        });
+    </script>
+<?php endif; ?>>
 
-        <!-- Formulario para agregar cliente -->
-        <div id="add-client-form" class="<?php echo $cliente_edit ? 'hidden' : ''; ?> mb-6 bg-white p-4 rounded shadow">
-            <form id="form-add-cliente" method="POST" autocomplete="off">
-                <input type="hidden" name="action" value="add_cliente">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block">ID:</label>
-                        <input type="text" class="w-full border px-2 py-1 bg-gray-100"
-                            value="<?php echo htmlspecialchars($next_id); ?>" disabled>
-                    </div>
-                    <div><label class="block">Nombre:</label><input type="text" name="nombre"
-                            class="w-full border px-2 py-1" required></div>
-                    <div><label class="block">Apellido Paterno:</label><input type="text" name="apellidoPaterno"
-                            class="w-full border px-2 py-1" required></div>
-                    <div><label class="block">Apellido Materno:</label><input type="text" name="apellidoMaterno"
-                            class="w-full border px-2 py-1" required></div>
-                    <div><label class="block">RFC:</label><input type="text" name="rfc" maxlength="13"
-                            class="w-full border px-2 py-1">
-                    </div>
-                    <div><label class="block">Teléfono:</label><input type="text" name="telefono" maxlength="10"
-                            class="w-full border px-2 py-1"></div>
-                    <div><label class="block">Email:</label><input type="email" name="email"
-                            class="w-full border px-2 py-1"></div>
-                    <div><label class="block">Calle:</label><input type="text" name="calle"
-                            class="w-full border px-2 py-1"></div>
-                    <div><label class="block">No. Casa:</label><input type="text" name="noCasa"
-                            class="w-full border px-2 py-1"></div>
-                    <div><label class="block">Colonia:</label><input type="text" name="colonia"
-                            class="w-full border px-2 py-1"></div>
-                    <div><label class="block">CP:</label><input type="text" name="cp" maxlength="5"
-                            class="w-full border px-2 py-1">
-                    </div>
-                    <div><label class="block">Ciudad:</label><input type="text" name="ciudad"
-                            class="w-full border px-2 py-1"></div>
-                    <div><label class="block">Estado:</label><input type="text" name="estado"
-                            class="w-full border px-2 py-1"></div>
-                    <div>
-                        <label class="block">Condición:</label>
-                        <select name="condicion" id="condicion" class="border border-gray-300 rounded px-2 py-1">
-                            <option value="1" <?php echo ($condicion === '1') ? 'selected' : ''; ?>>Activo</option>
-                            <option value="0" <?php echo ($condicion === '0') ? 'selected' : ''; ?>>Inactivo</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Guardar</button>
-                </div>
-            </form>
-        </div>
+<div class="container mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Gestión de Clientes</h1>
 
-        <!-- Formulario para editar cliente -->
-        <?php if ($cliente_edit): ?>
-            <div class="mb-6 bg-white p-4 rounded shadow">
-                <form method="POST" autocomplete="off">
-                    <input type="hidden" name="action" value="edit_cliente">
-                    <input type="hidden" name="idCliente" value="<?php echo $cliente_edit['idCliente']; ?>">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block">ID:</label>
-                            <input type="text" class="w-full border px-2 py-1 bg-gray-100"
-                                value="<?php echo htmlspecialchars($cliente_edit['idCliente']); ?>" disabled>
-                        </div>
-                        <div><label class="block">Nombre:</label><input type="text" name="nombre"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['nombre']); ?>" required></div>
-                        <div><label class="block">Apellido Paterno:</label><input type="text" name="apellidoPaterno"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['apellidoPaterno']); ?>" required></div>
-                        <div><label class="block">Apellido Materno:</label><input type="text" name="apellidoMaterno"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['apellidoMaterno']); ?>" required></div>
-                        <div><label class="block">RFC:</label><input type="text" name="rfc" maxlength="13"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['RFC']); ?>"></div>
-                        <div><label class="block">Teléfono:</label><input type="text" name="telefono" maxlength="10"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['telefono']); ?>"></div>
-                        <div><label class="block">Email:</label><input type="email" name="email"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['email']); ?>"></div>
-                        <div><label class="block">Calle:</label><input type="text" name="calle"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['calle']); ?>"></div>
-                        <div><label class="block">No. Casa:</label><input type="text" name="noCasa"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['noCasa']); ?>"></div>
-                        <div><label class="block">Colonia:</label><input type="text" name="colonia"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['colonia']); ?>"></div>
-                        <div><label class="block">CP:</label><input type="text" name="cp" maxlength="5"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['CP']); ?>"></div>
-                        <div><label class="block">Ciudad:</label><input type="text" name="ciudad"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['ciudad']); ?>"></div>
-                        <div><label class="block">Estado:</label><input type="text" name="estado"
-                                class="w-full border px-2 py-1"
-                                value="<?php echo htmlspecialchars($cliente_edit['estado']); ?>"></div>
-                        <div>
-                            <label class="block">Condición:</label>
-                            <select name="condicion" id="condicion" class="border border-gray-300 rounded px-2 py-1">
-                                <option value="1" <?php echo ($condicion === '1') ? 'selected' : ''; ?>>Activo</option>
-                                <option value="0" <?php echo ($condicion === '0') ? 'selected' : ''; ?>>Inactivo</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center">
-                        <button type="submit"
-                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">Actualizar</button>
-                        <a href="?page=customer"
-                            class="ml-4 px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold transition-colors duration-200">Cancelar</a>
-                    </div>
-                </form>
-            </div>
-        <?php endif; ?>
+    <!-- Botón para registrar cliente -->
+    <button onclick="openRegisterModal()"
+        class="mb-6 px-4 py-2 bg-purple-700 hover:bg-purple-500 text-white font-semibold rounded-lg text-lg transition hover:-translate-y-1 hover:shadow-lg">
+        Registrar cliente
+    </button>
 
-        <!-- Tabla de clientes activos -->
-        <h2 class="text-xl font-semibold mt-8 mb-2">Clientes activos</h2>
-        <table class="table-auto w-full bg-white rounded shadow overflow-hidden">
-            <thead>
-                <tr class="bg-gray-200 text-left">
-                    <th class="px-4 py-2">ID</th>
-                    <th class="px-4 py-2">Nombre</th>
-                    <th class="px-4 py-2">Apellido Paterno</th>
-                    <th class="px-4 py-2">Apellido Materno</th>
-                    <th class="px-4 py-2">RFC</th>
-                    <th class="px-4 py-2">Teléfono</th>
-                    <th class="px-4 py-2">Email</th>
-                    <th class="px-4 py-2">Dirección</th>
-                    <th class="px-4 py-2">Ciudad</th>
-                    <th class="px-4 py-2">Estado</th>
-                    <th class="px-4 py-2">Condición</th>
-                    <th class="px-4 py-2">Acciones</th>
+    <!-- Tabla de clientes activos (simplificada) -->
+    <h2 class="text-xl font-semibold mb-2">Clientes activos</h2>
+    <table class="table-auto w-full bg-white rounded shadow overflow-hidden">
+        <thead>
+            <tr class="border-b bg-purple-50">
+                <th class="px-4 py-2 text-left font-medium text-purple-800">ID</th>
+                <th class="px-4 py-2 text-left font-medium text-purple-800">Nombre</th>
+                <th class="px-4 py-2 text-left font-medium text-purple-800">Apellido Paterno</th>
+                <th class="px-4 py-2 text-left font-medium text-purple-800">RFC</th>
+                <th class="px-4 py-2 text-left font-medium text-purple-800">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($clientes as $cliente): ?>
+                <tr>
+                    <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['idCliente']); ?></td>
+                    <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['nombre']); ?></td>
+                    <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['apellidoPaterno']); ?></td>
+                    <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['RFC']); ?></td>
+                    <td class="border px-4 py-2">
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded"
+                            onclick='openDetailsModal(<?php echo json_encode($cliente); ?>)'>
+                            Ver detalles
+                        </button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($clientes as $cliente): ?>
-                    <tr>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['idCliente']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['nombre']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['apellidoPaterno']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['apellidoMaterno']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['RFC']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['telefono']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['email']); ?></td>
-                        <td class="border px-4 py-2">
-                            <?php
-                            echo htmlspecialchars($cliente['calle']) . ' No. ' . htmlspecialchars($cliente['noCasa']) . ', ' . htmlspecialchars($cliente['colonia']) . ', CP ' . htmlspecialchars($cliente['CP']);
-                            ?>
-                        </td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['ciudad']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['estado']); ?></td>
-                        <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['condicion']); ?></td>
-                        <td class="border px-4 py-2">
-                            <a href="?page=customer&action=edit&id=<?php echo $cliente['idCliente']; ?>"
-                                class="inline-block bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded mr-2">Editar</a>
-                            <a href="?page=customer&action=deactivate&id=<?php echo $cliente['idCliente']; ?>"
-                                class="inline-block bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                                onclick="return confirm('¿Seguro que deseas desactivar este cliente?');">Desactivar</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                <?php if (count($clientes) === 0): ?>
-                    <tr>
-                        <td colspan="12" class="text-center py-4">No hay clientes activos.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+            <?php endforeach; ?>
+            <?php if (count($clientes) === 0): ?>
+                <tr>
+                    <td colspan="5" class="text-center py-4">No hay clientes activos.</td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 
-        <!-- Tabla de clientes desactivados -->
-        <!-- Botón para abrir el modal -->
-        <!-- Botón para abrir el modal -->
-<button onclick="document.getElementById('modal-inactivos').classList.remove('hidden')"
-    class="mt-8 mb-2 bg-gray-500 hover:bg-gray-700 text-white px-4 py-2 rounded">
-    Ver clientes desactivados
-</button>
+    <!-- Botón y modal de clientes desactivados -->
+    <button onclick="document.getElementById('modal-inactivos').classList.remove('hidden')"
+        class="mt-8 px-3 py-1 bg-gray-700 hover:bg-gray-500 text-white font-semibold py-3 rounded-lg text-lg transition hover:-translate-y-1 hover:shadow-lg">
+        Ver clientes desactivados
+    </button>
 
-<!-- Modal de clientes desactivados -->
-<div id="modal-inactivos"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
-    onclick="this.classList.add('hidden')">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] p-6 relative overflow-y-auto"
-         onclick="event.stopPropagation()">
-        <!-- Botón de cerrar -->
-        <button onclick="document.getElementById('modal-inactivos').classList.add('hidden')"
-            class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
-        <h2 class="text-xl font-semibold mb-4">Clientes desactivados</h2>
-        <div class="overflow-x-auto">
-            <table class="table-auto w-full bg-white rounded shadow overflow-hidden">
-                <thead>
-                    <tr class="bg-gray-200 text-left">
-                        <th class="px-4 py-2">ID</th>
-                        <th class="px-4 py-2">Nombre</th>
-                        <th class="px-4 py-2">Apellido Paterno</th>
-                        <th class="px-4 py-2">Apellido Materno</th>
-                        <th class="px-4 py-2">RFC</th>
-                        <th class="px-4 py-2">Teléfono</th>
-                        <th class="px-4 py-2">Email</th>
-                        <th class="px-4 py-2">Dirección</th>
-                        <th class="px-4 py-2">Ciudad</th>
-                        <th class="px-4 py-2">Estado</th>
-                        <th class="px-4 py-2">Condición</th>
-                        <th class="px-4 py-2">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($clientes_inactivos as $cliente): ?>
-                        <tr>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['idCliente']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['nombre']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['apellidoPaterno']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['apellidoMaterno']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['RFC']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['telefono']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['email']); ?></td>
-                            <td class="border px-4 py-2">
-                                <?php
-                                echo htmlspecialchars($cliente['calle']) . ' No. ' . htmlspecialchars($cliente['noCasa']) . ', ' . htmlspecialchars($cliente['colonia']) . ', CP ' . htmlspecialchars($cliente['CP']);
-                                ?>
-                            </td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['ciudad']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['estado']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($cliente['condicion']); ?></td>
-                            <td class="border px-4 py-2">
-                                <a href="?page=customer&action=activate&id=<?php echo $cliente['idCliente']; ?>"
-                                    class="inline-block bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
-                                    onclick="return confirm('¿Seguro que deseas activar este cliente?');">Activar</a>
-                            </td>
+    <div id="modal-inactivos"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+        onclick="this.classList.add('hidden')">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-6xl max-h-[90vh] p-6 relative overflow-y-auto"
+            onclick="event.stopPropagation()">
+            <button onclick="document.getElementById('modal-inactivos').classList.add('hidden')"
+                class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
+            <h2 class="text-xl font-semibold mb-4">Clientes desactivados</h2>
+            <div class="overflow-x-auto">
+                <table class="table-auto w-full bg-white rounded shadow overflow-hidden">
+                    <thead>
+                        <tr class="border-b bg-purple-50">
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">ID</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Nombre</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Apellido Paterno</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Apellido Materno</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">RFC</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Teléfono</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Email</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Dirección</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Ciudad</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Estado</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Condición</th>
+                            <th class="px-2 py-1 text-left font-medium text-purple-800">Acciones</th>
                         </tr>
-                    <?php endforeach; ?>
-                    <?php if (count($clientes_inactivos) === 0): ?>
-                        <tr>
-                            <td colspan="12" class="text-center py-4">No hay clientes desactivados.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($clientes_inactivos as $cliente): ?>
+                            <tr>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['idCliente']); ?></td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['nombre']); ?></td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['apellidoPaterno']); ?></td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['apellidoMaterno']); ?></td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['RFC']); ?></td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['telefono']); ?></td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['email']); ?></td>
+                                <td class="border px-2 py-1">
+                                    <?php
+                                    echo htmlspecialchars($cliente['calle']) . ' No. ' . htmlspecialchars($cliente['noCasa']) . ', ' . htmlspecialchars($cliente['colonia']) . ', CP ' . htmlspecialchars($cliente['CP']);
+                                    ?>
+                                </td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['ciudad']); ?></td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['estado']); ?></td>
+                                <td class="border px-2 py-1"><?php echo htmlspecialchars($cliente['condicion']); ?></td>
+                                <td class="border px-2 py-1">
+                                    <a href="?page=customer&action=activate&id=<?php echo $cliente['idCliente']; ?>"
+                                        class="inline-block bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+                                        onclick="return confirm('¿Seguro que deseas activar este cliente?');">Activar</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php if (count($clientes_inactivos) === 0): ?>
+                            <tr>
+                                <td colspan="12" class="text-center py-4">No hay clientes desactivados.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Detalles del cliente -->
+    <div id="detailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+        onclick="closeDetailsModal()">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative" onclick="event.stopPropagation()">
+            <button onclick="closeDetailsModal()"
+                class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
+            <h2 class="text-xl font-semibold mb-4">Detalles del cliente</h2>
+            <div id="detailsContent"></div>
+            <div class="flex gap-2 mt-4">
+                <button id="editBtn"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded">Editar</button>
+                <button id="deactivateBtn"
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Desactivar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Editar cliente -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+        onclick="closeEditModal()">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative" onclick="event.stopPropagation()">
+            <button onclick="closeEditModal()"
+                class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
+            <h2 class="text-xl font-semibold mb-4">Editar cliente</h2>
+            <form id="editForm" method="POST" autocomplete="off"></form>
+        </div>
+    </div>
+
+    <!-- Modal: Registrar cliente -->
+    <div id="registerModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
+        onclick="closeRegisterModal()">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative" onclick="event.stopPropagation()">
+            <button onclick="closeRegisterModal()"
+                class="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-2xl font-bold">&times;</button>
+            <h2 class="text-xl font-semibold mb-4">Registrar cliente</h2>
+            <form id="registerForm" method="POST" autocomplete="off"></form>
         </div>
     </div>
 </div>
-</body>
 
-</html>
+<script>
+function openDetailsModal(cliente) {
+    let html = `
+        <div class="grid grid-cols-2 gap-2">
+            <div><b>ID:</b> ${cliente.idCliente}</div>
+            <div><b>Nombre:</b> ${cliente.nombre}</div>
+            <div><b>Apellido Paterno:</b> ${cliente.apellidoPaterno}</div>
+            <div><b>Apellido Materno:</b> ${cliente.apellidoMaterno}</div>
+            <div><b>RFC:</b> ${cliente.RFC}</div>
+            <div><b>Teléfono:</b> ${cliente.telefono}</div>
+            <div><b>Email:</b> ${cliente.email}</div>
+            <div><b>Calle:</b> ${cliente.calle}</div>
+            <div><b>No. Casa:</b> ${cliente.noCasa}</div>
+            <div><b>Colonia:</b> ${cliente.colonia}</div>
+            <div><b>CP:</b> ${cliente.CP}</div>
+            <div><b>Ciudad:</b> ${cliente.ciudad}</div>
+            <div><b>Estado:</b> ${cliente.estado}</div>
+            <div><b>Condición:</b> ${cliente.condicion == 1 ? 'Activo' : 'Inactivo'}</div>
+        </div>
+    `;
+    document.getElementById('detailsContent').innerHTML = html;
+    document.getElementById('detailsModal').classList.remove('hidden');
+    document.getElementById('editBtn').onclick = function () {
+        openEditModal(cliente);
+    };
+    document.getElementById('deactivateBtn').onclick = function () {
+        if (confirm('¿Seguro que deseas desactivar este cliente?')) {
+            window.location.href = '?page=customer&action=deactivate&id=' + cliente.idCliente;
+        }
+    };
+}
+function closeDetailsModal() {
+    document.getElementById('detailsModal').classList.add('hidden');
+}
+
+function openEditModal(cliente) {
+    let html = `
+        <input type="hidden" name="action" value="edit_cliente">
+        <input type="hidden" name="idCliente" value="${cliente.idCliente}">
+        <div class="grid grid-cols-2 gap-2">
+            <div><label>Nombre:</label><input type="text" name="nombre" value="${cliente.nombre}" class="w-full border px-2 py-1" required></div>
+            <div><label>Apellido Paterno:</label><input type="text" name="apellidoPaterno" value="${cliente.apellidoPaterno}" class="w-full border px-2 py-1" required></div>
+            <div><label>Apellido Materno:</label><input type="text" name="apellidoMaterno" value="${cliente.apellidoMaterno}" class="w-full border px-2 py-1" required></div>
+            <div><label>RFC:</label><input type="text" name="rfc" value="${cliente.RFC}" class="w-full border px-2 py-1"></div>
+            <div><label>Teléfono:</label><input type="text" name="telefono" value="${cliente.telefono}" class="w-full border px-2 py-1"></div>
+            <div><label>Email:</label><input type="email" name="email" value="${cliente.email}" class="w-full border px-2 py-1"></div>
+            <div><label>Calle:</label><input type="text" name="calle" value="${cliente.calle}" class="w-full border px-2 py-1"></div>
+            <div><label>No. Casa:</label><input type="text" name="noCasa" value="${cliente.noCasa}" class="w-full border px-2 py-1"></div>
+            <div><label>Colonia:</label><input type="text" name="colonia" value="${cliente.colonia}" class="w-full border px-2 py-1"></div>
+            <div><label>CP:</label><input type="text" name="cp" value="${cliente.CP}" class="w-full border px-2 py-1"></div>
+            <div><label>Ciudad:</label><input type="text" name="ciudad" value="${cliente.ciudad}" class="w-full border px-2 py-1"></div>
+            <div><label>Estado:</label><input type="text" name="estado" value="${cliente.estado}" class="w-full border px-2 py-1"></div>
+            <div>
+                <label>Condición:</label>
+                <select name="condicion" class="w-full border px-2 py-1">
+                    <option value="1" ${cliente.condicion == 1 ? 'selected' : ''}>Activo</option>
+                    <option value="0" ${cliente.condicion == 0 ? 'selected' : ''}>Inactivo</option>
+                </select>
+            </div>
+        </div>
+        <div class="mt-4 flex gap-3 items-center">
+            <button type="submit" class="px-4 py-2 bg-yellow-600 hover:bg-gray-500 text-white font-semibold rounded-lg">Actualizar</button>
+            <button type="button" onclick="closeEditModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-500 text-white font-semibold rounded-lg">Cancelar</button>
+        </div>
+    `;
+    document.getElementById('editForm').innerHTML = html;
+    document.getElementById('editModal').classList.remove('hidden');
+    closeDetailsModal();
+}
+function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+}
+
+function openRegisterModal() {
+    let html = `
+        <input type="hidden" name="action" value="add_cliente">
+        <div class="grid grid-cols-2 gap-2">
+            <div><label>Nombre:</label><input type="text" name="nombre" class="w-full border px-2 py-1" required></div>
+            <div><label>Apellido Paterno:</label><input type="text" name="apellidoPaterno" class="w-full border px-2 py-1" required></div>
+            <div><label>Apellido Materno:</label><input type="text" name="apellidoMaterno" class="w-full border px-2 py-1" required></div>
+            <div><label>RFC:</label><input type="text" name="rfc" class="w-full border px-2 py-1"></div>
+            <div><label>Teléfono:</label><input type="text" name="telefono" class="w-full border px-2 py-1"></div>
+            <div><label>Email:</label><input type="email" name="email" class="w-full border px-2 py-1"></div>
+            <div><label>Calle:</label><input type="text" name="calle" class="w-full border px-2 py-1"></div>
+            <div><label>No. Casa:</label><input type="text" name="noCasa" class="w-full border px-2 py-1"></div>
+            <div><label>Colonia:</label><input type="text" name="colonia" class="w-full border px-2 py-1"></div>
+            <div><label>CP:</label><input type="text" name="cp" class="w-full border px-2 py-1"></div>
+            <div><label>Ciudad:</label><input type="text" name="ciudad" class="w-full border px-2 py-1"></div>
+            <div><label>Estado:</label><input type="text" name="estado" class="w-full border px-2 py-1"></div>
+            <div>
+                <label>Condición:</label>
+                <select name="condicion" class="w-full border px-2 py-1">
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
+                </select>
+            </div>
+        </div>
+        <div class="mt-4 flex gap-3 items-center">
+            <button type="submit" class="px-4 py-2 bg-purple-700 hover:bg-purple-500 text-white font-semibold rounded-lg">Registrar</button>
+            <button type="button" onclick="closeRegisterModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-500 text-white font-semibold rounded-lg">Cancelar</button>
+        </div>
+    `;
+    document.getElementById('registerForm').innerHTML = html;
+    document.getElementById('registerModal').classList.remove('hidden');
+}
+function closeRegisterModal() {
+    document.getElementById('registerModal').classList.add('hidden');
+}
+</script>
