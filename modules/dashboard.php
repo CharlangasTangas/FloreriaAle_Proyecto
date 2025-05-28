@@ -1,4 +1,77 @@
+<<<<<<< Updated upstream
 <div class="flex flex-col gap-6">
+=======
+<?php
+require_once 'config/connection.php';
+
+$mesActual = date('m');
+$anioActual = date('Y');
+
+$ventasMes = $connection->query("
+    SELECT SUM(total) AS total_ventas 
+    FROM Venta 
+    WHERE MONTH(fechaEmision) = $mesActual AND YEAR(fechaEmision) = $anioActual
+")->fetch_assoc()['total_ventas'] ?? 0;
+
+$comprasMes = $connection->query("
+    SELECT SUM(total) AS total_compras 
+    FROM Compra 
+    WHERE MONTH(fechaCompra) = $mesActual AND YEAR(fechaCompra) = $anioActual
+")->fetch_assoc()['total_compras'] ?? 0;
+
+$empleadoTop = $connection->query("
+    SELECT e.nombre, e.apellidoPaterno, e.apellidoMaterno, COUNT(v.idVenta) AS total_ventas
+    FROM Venta v
+    JOIN Empleado e ON v.idEmpleado = e.idEmpleado
+    WHERE MONTH(v.fechaEmision) = $mesActual AND YEAR(v.fechaEmision) = $anioActual
+    GROUP BY v.idEmpleado
+    ORDER BY total_ventas DESC
+    LIMIT 1
+")->fetch_assoc();
+
+$productoTop = $connection->query("
+    SELECT p.nombre, SUM(dv.cantidad) AS total_vendido
+    FROM DetalleVenta dv
+    JOIN Venta v ON dv.idVenta = v.idVenta
+    JOIN Producto p ON dv.idProducto = p.idProducto
+    WHERE MONTH(v.fechaEmision) = $mesActual AND YEAR(v.fechaEmision) = $anioActual
+    GROUP BY dv.idProducto
+    ORDER BY total_vendido DESC
+    LIMIT 1
+")->fetch_assoc();
+// Consulta ventas totales agrupadas por mes del año actual
+$query = "
+    SELECT MONTH(fechaEmision) AS mes, 
+           SUM(total) AS totalVentas
+    FROM Venta
+    WHERE YEAR(fechaEmision) = YEAR(CURDATE())
+    GROUP BY MONTH(fechaEmision)
+    ORDER BY mes
+";
+
+$result = $connection->query($query);
+
+$ventasPorMes = array_fill(1, 12, 0); // Inicializa todos los meses con 0
+
+while ($row = $result->fetch_assoc()) {
+    $mes = (int)$row['mes'];
+    $ventasPorMes[$mes] = (float)$row['totalVentas'];
+}
+
+$connection->close();
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+<div class="flex flex-col gap-6 max-w-7xl mx-auto px-4 py-8">
+>>>>>>> Stashed changes
     <div>
         <h2 class="text-2xl font-bold tracking-tight">Dashboard</h2>
         <p class="text-gray-500">Overview of your store performance and activity.</p>

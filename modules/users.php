@@ -32,12 +32,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<<<<<<< Updated upstream
 
 <div class="flex flex-col gap-6">
     <div>
         <h2 class="text-2xl font-bold tracking-tight">User Management</h2>
         <p class="text-gray-500">Create, view, update, and delete system users.</p>
     </div>
+=======
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Gestión de Clientes</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FontAwesome para iconos (asegúrate de incluirlo) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+>>>>>>> Stashed changes
 
     <div class="rounded-lg border bg-white shadow">
         <div class="flex flex-row items-center justify-between p-4 pb-2">
