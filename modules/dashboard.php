@@ -42,13 +42,7 @@ $productoTop = $connection->query("
     ORDER BY total_vendido DESC
     LIMIT 1
 ")->fetch_assoc();
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
 
->>>>>>> compras
-=======
->>>>>>> Stashed changes
 // Consulta ventas totales agrupadas por mes del año actual
 $query = "
     SELECT MONTH(fechaEmision) AS mes, 
