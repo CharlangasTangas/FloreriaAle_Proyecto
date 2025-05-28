@@ -23,12 +23,12 @@ if (!in_array($page, $valid_pages)) {
 $module_path = 'modules/' . $page . '.php';
 ?>
 
-<div class="flex overflow-hidden bg-gray-50 pt-16">
+<div class="flex overflow-hidden bg-purple-50 pt-16">
     <!-- Sidebar is included above -->
     
     <!-- Content area -->
-    <div id="main-content" class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 transition-margin duration-300">
-        <main class="p-4 md:p-6">
+    <div id="main-content" class="relative w-full h-full overflow-y-auto bg-purple-50 lg:ml-64 transition-margin duration-300 ">
+        <main class="p-4 md:p-6 bg-purple-50">
             <?php
             if (file_exists($module_path)) {
                 include $module_path;
