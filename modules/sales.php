@@ -8,30 +8,6 @@ $sales = [
     ['id' => 5, 'invoice' => 'INV-005', 'customer' => 'Robert Wilson', 'date' => '2023-04-22', 'total' => 199.99, 'status' => 'Completed'],
 ];
 
-// Sample products for new sale
-$available_products = [
-    ['id' => 1, 'name' => 'Laptop', 'sku' => 'LPT-001', 'price' => 999.99, 'stock' => 25],
-    ['id' => 2, 'name' => 'Wireless Mouse', 'sku' => 'WMS-002', 'price' => 29.99, 'stock' => 50],
-    ['id' => 3, 'name' => 'USB-C Cable', 'sku' => 'USB-003', 'price' => 12.99, 'stock' => 100],
-    ['id' => 4, 'name' => 'Printer', 'sku' => 'PRT-004', 'price' => 199.99, 'stock' => 15],
-    ['id' => 5, 'name' => 'Printer Paper', 'sku' => 'PPR-005', 'price' => 9.99, 'stock' => 200],
-];
-
-// Handle form submissions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        if ($_POST['action'] === 'create_sale') {
-            // In a real application, you would add the sale to the database
-            // For this example, we'll just show a success message
-            echo "<script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    showToast('Sale completed successfully');
-                });
-            </script>";
-        }
-    }
-}
-
 include 'config/connection.php';
 ?>
 
@@ -83,16 +59,19 @@ include 'config/connection.php';
                                                 <option value="">Seleccionar</option>
                                                 <!-- Cargar productos al SELECT -->
                                                 <?php
-                                                    $sql = "SELECT nombre FROM Producto";
+                                                    $sql = "SELECT idProducto, nombre, stock, precioVenta FROM Producto";
                                                     $result = $connection->query($sql);
 
                                                     while ($row = $result->fetch_assoc()) {
                                                         $id = $row['idProducto'];
                                                         $nombre = $row['nombre'];
-                                                        echo "<option value=\"$id\">$nombre</option>";
+                                                        $stock = $row['stock'];
+                                                        $precioVenta = $row['precioVenta'];
+                                                        echo "<option value=\"$id\" data-price=\"$precioVenta\" data-stock=\"$stock\">$nombre</option>";
                                                     }
                                                 ?>
                                             </select>
+                                            <input type="hidden" class="item-stock-hidden" name="stock[]">
                                         </td>
                                         <td class="p-2">
                                             <input type="text" name="price[]" class="item-price w-full rounded-md border border-purple-100 px-2 py-1 text-sm focus:border-purple-500 focus:outline-none" readonly>
@@ -130,7 +109,8 @@ include 'config/connection.php';
                         <div>
                             <label for="status" class="mb-1 block text-sm font-medium text-purple-800">Estado</label>
                             <select id="status" name="status" class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none">
-                                <option value="Completed">Completado</option>
+                                <option value="Pending">Seleccionar</option>
+                                <option value="Completed">Completado</option>   
                                 <option value="Pending">Pendiente</option>
                             </select>
                         </div>
@@ -146,13 +126,35 @@ include 'config/connection.php';
                             Total: $<span id="grand-total">0.00</span>
                             <input type="hidden" name="grand_total" id="grand-total-input" value="0">
                         </div>
-                        <button type="submit" class="px-4 py-2 bg-purple-700  hover:bg-purple-500 text-white font-semibold py-3 rounded-lg text-lg transition hover:-translate-y-1 hover:shadow-lg">
-                            Realizar Venta
-                        </button>
+
+                            <button type="button" onclick="realizarVenta()" class="px-4 bg-purple-700  hover:bg-purple-500 text-white font-semibold py-3 rounded-lg text-lg transition hover:-translate-y-1 hover:shadow-lg">
+                                Realizar Venta
+                            </button>
                     </div>
                 </form>
             </div>
         </div>
+
+        <!-- Modal de Venta Exitosa -->
+        <div id="modal-venta-exitosa" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 hidden">
+            <div class="bg-white rounded-2xl p-8 shadow-xl w-full max-w-md text-center animate-fade-in">
+                <h2 class="text-2xl font-bold text-purple-700 mb-4">✅ ¡Venta realizada con éxito!</h2>
+                <p class="text-gray-600 mb-6">La venta ha sido registrada correctamente.</p>
+                <button onclick="cerrarModalVenta()" class="bg-purple-700 hover:bg-purple-600 text-white font-semibold py-2 px-6 rounded-lg transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+
+        <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out;
+        }
+        </style>
         
         <!-- Recent Sales -->
         <div class="rounded-lg border bg-white shadow">
@@ -206,108 +208,3 @@ include 'config/connection.php';
 </div>
 
 <script src="assets/js/sales.js"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const saleForm = document.getElementById('sale-form');
-        const saleItems = document.getElementById('sale-items');
-        const addItemBtn = document.getElementById('add-item');
-        const grandTotalSpan = document.getElementById('grand-total');
-        const grandTotalInput = document.getElementById('grand-total-input');
-        
-        // Initialize the first row
-        initializeRow(saleItems.querySelector('tbody tr'));
-        
-        // Add new item row
-        addItemBtn.addEventListener('click', function() {
-            const template = document.getElementById('item-row-template');
-            const newRow = template.cloneNode(true);
-            newRow.id = '';
-            saleItems.querySelector('tbody').appendChild(newRow);
-            initializeRow(newRow);
-        });
-        
-        // Initialize a row's event listeners
-        function initializeRow(row) {
-            const productSelect = row.querySelector('.product-select');
-            const priceInput = row.querySelector('.item-price');
-            const quantityInput = row.querySelector('.item-quantity');
-            const totalInput = row.querySelector('.item-total');
-            const removeBtn = row.querySelector('.remove-item');
-            
-            // Product selection change
-            productSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const price = selectedOption.dataset.price || 0;
-                priceInput.value = price;
-                updateRowTotal(row);
-            });
-            
-            // Quantity change
-            quantityInput.addEventListener('input', function() {
-                updateRowTotal(row);
-            });
-            
-            // Remove item
-            removeBtn.addEventListener('click', function() {
-                if (saleItems.querySelectorAll('tbody tr').length > 1) {
-                    row.remove();
-                    updateGrandTotal();
-                } else {
-                    // Reset the first row instead of removing it
-                    productSelect.value = '';
-                    priceInput.value = '';
-                    quantityInput.value = 1;
-                    totalInput.value = '';
-                    updateGrandTotal();
-                }
-            });
-        }
-        
-        // Update a row's total
-        function updateRowTotal(row) {
-            const priceInput = row.querySelector('.item-price');
-            const quantityInput = row.querySelector('.item-quantity');
-            const totalInput = row.querySelector('.item-total');
-            
-            const price = parseFloat(priceInput.value) || 0;
-            const quantity = parseInt(quantityInput.value) || 0;
-            const total = price * quantity;
-            
-            totalInput.value = total.toFixed(2);
-            updateGrandTotal();
-        }
-        
-        // Update the grand total
-        function updateGrandTotal() {
-            const totalInputs = document.querySelectorAll('.item-total');
-            let grandTotal = 0;
-            
-            totalInputs.forEach(input => {
-                grandTotal += parseFloat(input.value) || 0;
-            });
-            
-            grandTotalSpan.textContent = grandTotal.toFixed(2);
-            grandTotalInput.value = grandTotal.toFixed(2);
-        }
-        
-        // Search functionality for sales
-        const searchInput = document.getElementById('sale-search');
-        const tableRows = document.querySelectorAll('tbody tr:not(#item-row-template)');
-        
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            
-            tableRows.forEach(row => {
-                const invoice = row.cells[0].textContent.toLowerCase();
-                const customer = row.cells[1].textContent.toLowerCase();
-                
-                if (invoice.includes(searchTerm) || customer.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    });
-</script>
