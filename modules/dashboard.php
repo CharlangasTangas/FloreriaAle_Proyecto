@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-<div class="flex flex-col gap-6">
-=======
-=======
->>>>>>> compras
 <?php
 require_once 'config/connection.php';
 
@@ -42,13 +36,7 @@ $productoTop = $connection->query("
     ORDER BY total_vendido DESC
     LIMIT 1
 ")->fetch_assoc();
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
 
->>>>>>> compras
-=======
->>>>>>> Stashed changes
 // Consulta ventas totales agrupadas por mes del año actual
 $query = "
     SELECT MONTH(fechaEmision) AS mes, 
@@ -81,10 +69,7 @@ $connection->close();
 </head>
 <body class="bg-gray-100 text-gray-900">
 <div class="flex flex-col gap-6 max-w-7xl mx-auto px-4 py-8">
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
->>>>>>> compras
+    
     <div>
         <h2 class="text-2xl font-bold tracking-tight">Dashboard</h2>
         <p class="text-gray-500">Resumen del rendimiento de ventas y compras.</p>
