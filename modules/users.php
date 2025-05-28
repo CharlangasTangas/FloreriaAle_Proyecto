@@ -109,25 +109,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 ?>
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 
 <div class="flex flex-col gap-6">
     <div>
         <h2 class="text-2xl font-bold tracking-tight">User Management</h2>
         <p class="text-gray-500">Create, view, update, and delete system users.</p>
     </div>
-=======
-<!DOCTYPE html>
-<html lang="es">
-=======
-<!DOCTYPE html>
-<html lang="es">
-<<<<<<< Updated upstream
 
->>>>>>> compras
-=======
->>>>>>> Stashed changes
+<!DOCTYPE html>
+<html lang="es">
+
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8" />
     <title>Gestión de Clientes</title>
@@ -138,10 +131,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <!-- FontAwesome para iconos (asegúrate de incluirlo) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 </head>
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
->>>>>>> compras
 
 <body class="bg-gray-100 p-6">
 
