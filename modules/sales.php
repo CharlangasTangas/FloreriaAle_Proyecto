@@ -71,6 +71,7 @@ include 'config/connection.php';
                                                     }
                                                 ?>
                                             </select>
+                                            <input type="hidden" name="idCliente" id="idCliente" value="">
                                             <input type="hidden" class="item-stock-hidden" name="stock[]">
                                         </td>
                                         <td class="p-2">
@@ -97,6 +98,18 @@ include 'config/connection.php';
                     </div>
                     
                     <div class="mb-4 grid grid-cols-2 gap-4">
+
+                        <!-- Campo oculto para cliente (puede ser null) -->
+                        <input type="hidden" name="idCliente" id="idCliente" value="">
+                        
+
+                        <?php if (isset($_SESSION['idEmpleado'])): ?>
+                            <input type="hidden" name="idEmpleado" value="<?php echo $_SESSION['idEmpleado']; ?>">
+                        <?php else: ?>
+                            <script>alert('⚠️ No se encontró idEmpleado en la sesión');</script>
+                        <?php endif; ?>
+
+                        
                         <div>
                             <label for="payment-method" class="mb-1 block text-sm font-medium text-purple-800">Método de Pago</label>
                             <select id="payment-method" name="payment_method" class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none">
@@ -109,7 +122,7 @@ include 'config/connection.php';
                         <div>
                             <label for="status" class="mb-1 block text-sm font-medium text-purple-800">Estado</label>
                             <select id="status" name="status" class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none">
-                                <option value="Pending">Seleccionar</option>
+                                <option value="Select">Seleccionar</option>
                                 <option value="Completed">Completado</option>   
                                 <option value="Pending">Pendiente</option>
                             </select>

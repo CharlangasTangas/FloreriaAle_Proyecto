@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json');
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 
 include __DIR__ . "/../../config/connection.php";
 
@@ -16,17 +16,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+    $idCliente = !empty($_POST['idCliente']) ? intval($_POST['idCliente']) : null;
+    $idEmpleado = isset($_POST['idEmpleado']) ? intval($_POST['idEmpleado']) : null;
     $productos = $_POST['product'];
     $cantidades = $_POST['quantity'];
     $precios = $_POST['price'];
     $stocks = $_POST['stock'];
-    $metodoPago = $_POST['payment-method'];
-    $estado = $_POST['status'];
+    $metodoPago = isset($_POST['payment_method']) ? $_POST['payment_method'] : null;
+    $estado = isset($_POST['status']) ? $_POST['status'] : null;
+    $comentarios = !empty($_POST['notes']) ? strval($_POST['notes']) : null;
 
-    $idCliente = !empty($_POST['idCliente']) ? intval($_POST['idCliente']) : null;
-    $idEmpleado = intval($_POST['idEmpleado']);
+    if (!$idEmpleado) {
+        http_response_code(403);
+        echo json_encode([
+            "status" => "error",
+            "message" => "Empleado no identificado."
+        ]);
+        exit();
+    }
+
     $subtotal = 0;
-
     foreach ($productos as $i => $idProducto) {
         $cantidad = intval($cantidades[$i]);
 
@@ -57,10 +66,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $total = $subtotal + $iva;
     $fecha = date('Y-m-d');
 
-    $sqlVenta = "INSERT INTO Venta (idCliente, idEmpleado, subtotal, iva, total, fechaEmision, metodoPago, estado)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $sqlVenta = "INSERT INTO Venta (idCliente, idEmpleado, subtotal, iva, total, fechaEmision, metodoPago, estado, comentario)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtVenta = $connection->prepare($sqlVenta);
-    $stmtVenta->bind_param("iiddsss", $idCliente, $idEmpleado, $subtotal, $iva, $total, $fecha, $metodoPago, $estado);
+    $stmtVenta->bind_param("iiddsssss", $idCliente, $idEmpleado, $subtotal, $iva, $total, $fecha, $metodoPago, $estado, $comentarios);
     $stmtVenta->execute();
     $idVenta = $stmtVenta->insert_id;
 

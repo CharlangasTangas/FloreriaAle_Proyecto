@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($usuarioData) {
         if ($clave === $usuarioData['clave']) {
+            $_SESSION['idEmpleado'] = $usuarioData['idEmpleado'];
             $_SESSION['usuario'] = $usuarioData['usuario'];
             $_SESSION['nombre'] = $usuarioData['nombre'];
             $_SESSION['rol'] = $usuarioData['rol'];

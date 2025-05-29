@@ -4,6 +4,34 @@ document.addEventListener("DOMContentLoaded", function () {
   const addItemBtn = document.getElementById("add-item");
   const grandTotalSpan = document.getElementById("grand-total");
   const grandTotalInput = document.getElementById("grand-total-input");
+  const inputCliente = document.getElementById("customer");
+  const hiddenIdCliente = document.getElementById("idCliente");
+  const sugerenciasDiv = document.getElementById("sugerencias");
+
+  //Autocompletado
+  inputCliente.addEventListener("input", () => {
+    const query = inputCliente.value.trim();
+
+    if (query.length === 0) {
+      sugerenciasDiv.innerHTML = "";
+      hiddenIdCliente.value = "";
+      return;
+    }
+
+    fetch("assets/queries/buscar_cliente.php?q=" + encodeURIComponent(query))
+      .then((res) => res.text())
+      .then((data) => {
+        sugerenciasDiv.innerHTML = data;
+
+        document.querySelectorAll(".opcion-cliente").forEach((item) => {
+          item.addEventListener("click", () => {
+            inputCliente.value = item.textContent.trim();
+            hiddenIdCliente.value = item.dataset.id;
+            sugerenciasDiv.innerHTML = "";
+          });
+        });
+      });
+  });
 
   // Función para inicializar una fila
   function initializeRow(row) {
@@ -85,15 +113,26 @@ document.addEventListener("DOMContentLoaded", function () {
       method: "POST",
       body: formData,
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status === "success") {
-          mostrarModalVenta();
-          saleForm.reset();
-          grandTotalSpan.textContent = "0.00";
-          grandTotalInput.value = "0";
-        } else {
-          alert("❌ " + data.message);
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Respuesta no OK del servidor");
+        }
+        return res.text();
+      })
+      .then((text) => {
+        try {
+          const data = JSON.parse(text);
+          if (data.status === "success") {
+            mostrarModalVenta();
+            saleForm.reset();
+            grandTotalSpan.textContent = "0.00";
+            grandTotalInput.value = "0";
+          } else {
+            alert("❌ " + data.message);
+          }
+        } catch (e) {
+          console.error("Respuesta no es JSON válido:", text);
+          alert("❌ Error: respuesta inválida del servidor");
         }
       })
       .catch((error) => {

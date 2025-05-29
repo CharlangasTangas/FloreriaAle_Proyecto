@@ -152,8 +152,8 @@ $connection->close();
             datasets: [{
                 label: 'Ventas',
                 data: ventasMes,
-                borderColor: 'rgba(59, 130, 246, 1)',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderColor: 'rgba(125, 52, 235, 1)',
+                backgroundColor: 'rgba(125, 52, 235, 0.1)',
                 borderWidth: 2,
                 tension: 0.4,
                 fill: true
