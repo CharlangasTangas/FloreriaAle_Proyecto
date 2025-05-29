@@ -60,9 +60,7 @@ $ventasDisponibles = obtenerVentas($connection);
             <button type="button" class="inline-flex items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600">
                 <i class="fas fa-file-pdf mr-2"></i> Download PDF
             </button>
-=======
-=======
->>>>>>> compras
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -76,7 +74,7 @@ $ventasDisponibles = obtenerVentas($connection);
     <div class="mb-6">
         <h1 class="text-3xl font-bold">Facturas</h1>
         <p class="text-gray-600">Facturación de Florería Ale</p>
-<<<<<<< HEAD
+
     </div>
 
     <!-- Botón Emitir Factura -->
@@ -142,10 +140,8 @@ $ventasDisponibles = obtenerVentas($connection);
                     </button>
                 </div>
             </form>
->>>>>>> Stashed changes
         </div>
-=======
->>>>>>> compras
+
     </div>
 
     <!-- Botón Emitir Factura -->
@@ -281,6 +277,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['cargarVenta'])) {
         </table>
         <?php
     endif;
+
     exit;
+
+
 }
-?>
+endif;
+?> 
