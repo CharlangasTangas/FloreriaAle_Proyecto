@@ -85,6 +85,16 @@
                         </a>
                     </li>
 
+                    <!-- P E R D I D A S -->
+                    <li>
+                        <a href="?page=perdida"
+                            class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group <?php echo (isset($_GET['page']) && $_GET['page'] === 'perdidas') ? 'bg-gray-100' : ''; ?>">
+                            <i
+                                class="fa-solid fa-boxes-packing w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
+                            <span class="ml-3">Perdidas</span>
+                        </a>
+                    </li>
+
                 </ul>
                 <ul class="pt-4 mt-4 space-y-2">
 

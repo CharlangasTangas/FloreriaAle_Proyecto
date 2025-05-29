@@ -13,7 +13,7 @@ include 'includes/sidebar.php';
 
 // Determine which page to load
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-$valid_pages = ['dashboard', 'sales', 'invoices', 'purchases', 'products', 'users', 'customer','supplier', 'test'];
+$valid_pages = ['dashboard', 'sales', 'invoices', 'purchases', 'products', 'users', 'customer','supplier', 'test', 'perdida'];
 
 if (!in_array($page, $valid_pages)) {
     $page = 'dashboard';
