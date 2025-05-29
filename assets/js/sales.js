@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
   window.realizarVenta = function () {
     const formData = new FormData(saleForm);
 
-    fetch("assets/queries/realizar_venta.php", {
+    fetch("/fbd/FloreriaAle_Proyecto/assets/queries/realizar_venta.php", {
       method: "POST",
       body: formData,
     })

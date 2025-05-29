@@ -4,26 +4,32 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include __DIR__ . "../../config/connection.php";
+include __DIR__ . "/../../config/connection.php";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!isset($_POST['product']) || empty($_POST['product'])) {
+        http_response_code(400);
+        echo json_encode([
+            "status" => "error",
+            "message" => "No se recibieron productos."
+        ]);
+        exit();
+    }
+
     $productos = $_POST['product'];
     $cantidades = $_POST['quantity'];
     $precios = $_POST['price'];
     $stocks = $_POST['stock'];
-    $metodoPago = $_POST['metodoPago'];
-    $estado = $_POST['estado'];
+    $metodoPago = $_POST['payment-method'];
+    $estado = $_POST['status'];
 
     $idCliente = !empty($_POST['idCliente']) ? intval($_POST['idCliente']) : null;
     $idEmpleado = intval($_POST['idEmpleado']);
-
     $subtotal = 0;
 
-    // Validar stock antes de hacer cambios
     foreach ($productos as $i => $idProducto) {
         $cantidad = intval($cantidades[$i]);
 
-        // Consultar stock actual desde la base de datos (por si cambió)
         $sqlCheck = "SELECT stock FROM Producto WHERE idProducto = ?";
         $stmtCheck = $connection->prepare($sqlCheck);
         $stmtCheck->bind_param("i", $idProducto);
@@ -41,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Calcular subtotal
     foreach ($cantidades as $i => $cantidad) {
         $cantidad = intval($cantidad);
         $precio = floatval($precios[$i]);
@@ -52,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $total = $subtotal + $iva;
     $fecha = date('Y-m-d');
 
-    // Insertar venta
     $sqlVenta = "INSERT INTO Venta (idCliente, idEmpleado, subtotal, iva, total, fechaEmision, metodoPago, estado)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtVenta = $connection->prepare($sqlVenta);
@@ -60,20 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmtVenta->execute();
     $idVenta = $stmtVenta->insert_id;
 
-    // Insertar detalles y actualizar stock
     foreach ($productos as $i => $idProducto) {
         $cantidad = intval($cantidades[$i]);
         $precio = floatval($precios[$i]);
         $subtotalItem = $cantidad * $precio;
 
-        // Insertar detalle
         $sqlDetalle = "INSERT INTO DetalleVenta (idVenta, idProducto, cantidad, precioUnitario, subtotal)
                        VALUES (?, ?, ?, ?, ?)";
         $stmtDetalle = $connection->prepare($sqlDetalle);
         $stmtDetalle->bind_param("iiidd", $idVenta, $idProducto, $cantidad, $precio, $subtotalItem);
         $stmtDetalle->execute();
 
-        // Restar stock
         $sqlStock = "UPDATE Producto SET stock = stock - ? WHERE idProducto = ?";
         $stmtStock = $connection->prepare($sqlStock);
         $stmtStock->bind_param("ii", $cantidad, $idProducto);
