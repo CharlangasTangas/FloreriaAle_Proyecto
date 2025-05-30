@@ -41,10 +41,50 @@ function obtenerVentas($connection) {
     return $ventas;
 }
 $ventasDisponibles = obtenerVentas($connection);
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['cargarVenta'])){
+    $idVenta = intval($_GET['cargarVenta']);
+
+    $venta = $connection->query("SELECT * FROM Venta WHERE idVenta = $idVenta")->fetch_assoc();
+    $detalles = $connection->query("SELECT * FROM DetalleVenta WHERE idVenta = $idVenta");
+
+    if ($venta):
+        <p><strong>Cliente:</strong> <?= $venta['idCliente'] ?></p>
+        <p><strong>Empleado:</strong> <?= $venta['idEmpleado'] ?></p>
+        <p><strong>Subtotal:</strong> $<?= number_format($venta['subtotal'], 2) ?></p>
+        <p><strong>IVA:</strong> $<?= number_format($venta['iva'], 2) ?></p>
+        <p><strong>Total:</strong> $<?= number_format($venta['total'], 2) ?></p>
+        <p><strong>Fecha de Emisión:</strong> <?= $venta['fechaEmision'] ?></p>
+
+        <h4 class="mt-4 font-semibold">Detalle de productos:</h4>
+        <table class="w-full text-sm border mt-2">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border p-1">Producto</th>
+                    <th class="border p-1">Cantidad</th>
+                    <th class="border p-1">Precio Unitario</th>
+                    <th class="border p-1">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($detalle = $detalles->fetch_assoc()): ?>
+                    <tr>
+                        <td class="border p-1"><?= $detalle['idProducto'] ?></td>
+                        <td class="border p-1"><?= $detalle['cantidad'] ?></td>
+                        <td class="border p-1">$<?= number_format($detalle['precioUnitario'], 2) ?></td>
+                        <td class="border p-1">$<?= number_format($detalle['subtotal'], 2) ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+        
+    endif;
+
+    exit;
+}
+
 ?>
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 <?php if ($view_invoice && $current_invoice): ?>
 <!-- Invoice Detail View -->
 <div class="flex flex-col gap-6">
@@ -237,50 +277,5 @@ $ventasDisponibles = obtenerVentas($connection);
 </body>
 </html>
 
-<?php
-// Lógica AJAX para devolver detalles de venta si es una petición GET
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['cargarVenta'])) {
-    $idVenta = intval($_GET['cargarVenta']);
-
-    $venta = $connection->query("SELECT * FROM Venta WHERE idVenta = $idVenta")->fetch_assoc();
-    $detalles = $connection->query("SELECT * FROM DetalleVenta WHERE idVenta = $idVenta");
-
-    if ($venta):
-        ?>
-        <p><strong>Cliente:</strong> <?= $venta['idCliente'] ?></p>
-        <p><strong>Empleado:</strong> <?= $venta['idEmpleado'] ?></p>
-        <p><strong>Subtotal:</strong> $<?= number_format($venta['subtotal'], 2) ?></p>
-        <p><strong>IVA:</strong> $<?= number_format($venta['iva'], 2) ?></p>
-        <p><strong>Total:</strong> $<?= number_format($venta['total'], 2) ?></p>
-        <p><strong>Fecha de Emisión:</strong> <?= $venta['fechaEmision'] ?></p>
-
-        <h4 class="mt-4 font-semibold">Detalle de productos:</h4>
-        <table class="w-full text-sm border mt-2">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="border p-1">Producto</th>
-                    <th class="border p-1">Cantidad</th>
-                    <th class="border p-1">Precio Unitario</th>
-                    <th class="border p-1">Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($detalle = $detalles->fetch_assoc()): ?>
-                    <tr>
-                        <td class="border p-1"><?= $detalle['idProducto'] ?></td>
-                        <td class="border p-1"><?= $detalle['cantidad'] ?></td>
-                        <td class="border p-1">$<?= number_format($detalle['precioUnitario'], 2) ?></td>
-                        <td class="border p-1">$<?= number_format($detalle['subtotal'], 2) ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-        <?php
-    endif;
-
-    exit;
 
 
-}
-endif;
-?> 
