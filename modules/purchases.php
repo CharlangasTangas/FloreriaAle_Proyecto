@@ -117,15 +117,6 @@ include 'config/connection.php';
                                 <option value="Other">Otro</option>
                             </select>
                         </div>
-                        <div>
-                            <label for="status" class="mb-1 block text-sm font-medium text-purple-800">Estado</label>
-                            <select id="status" name="status" class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none">
-                                <option value="Select">Seleccionar</option>
-                                <option value="Completed">Completado</option> 
-                                <option value="Pending">Pendiente</option>
-                                <option value="Cancelled">Cancelado</option>
-                            </select>
-                        </div>
                     </div>
                     
                     <div class="mb-4">
@@ -181,7 +172,6 @@ include 'config/connection.php';
                         <thead>
                             <tr class="border-b bg-purple-50">
                                 <th class="p-3 text-left font-medium text-purple-800">Id</th>
-                                <th class="p-3 text-left font-medium text-purple-800">Empleado</th>
                                 <th class="p-3 text-left font-medium text-purple-800">Proveedor</th>
                                 <th class="p-3 text-left font-medium text-purple-800">Fecha</th>
                                 <th class="p-3 text-left font-medium text-purple-800">Total</th>
@@ -200,3 +190,6 @@ include 'config/connection.php';
         </div>
     </div>
 </div>
+
+<script src="assets/js/purchases/purchases.js"></script>
+<script src="assets/js/purchases/recent_purchases.js"></script>
