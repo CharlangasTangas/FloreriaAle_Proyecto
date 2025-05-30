@@ -15,7 +15,6 @@ $sql = "
     LEFT JOIN Cliente c ON v.idCliente = c.idCliente
     LEFT JOIN Empleado e ON v.idEmpleado = e.idEmpleado
     ORDER BY v.idVenta DESC
-    LIMIT 10
 ";
 
 $result = $connection->query($sql);

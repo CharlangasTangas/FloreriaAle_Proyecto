@@ -153,7 +153,7 @@ $connection->close();
                 label: 'Ventas',
                 data: ventasMes,
                 borderColor: 'rgba(125, 52, 235, 1)',
-                backgroundColor: 'rgba(125, 52, 235, 0.1)',
+                backgroundColor: 'rgba(125, 52, 235 , 0.1)',
                 borderWidth: 2,
                 tension: 0.4,
                 fill: true

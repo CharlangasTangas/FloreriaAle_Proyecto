@@ -99,6 +99,10 @@ document.addEventListener("DOMContentLoaded", function () {
             saleForm.reset();
             grandTotalSpan.textContent = "0.00";
             grandTotalInput.value = "0";
+
+            if (typeof window.renderVentasDesdeExternos === "function") {
+              window.renderVentasDesdeExternos(); // 🔄 Recarga ventas recientes dinámicamente
+            }
           } else {
             alert("❌ " + data.message);
           }
@@ -165,3 +169,68 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+function cargarVentaParaEditar(id) {
+  fetch(`/fbd/FloreriaAle_Proyecto/assets/queries/obtener_detalle_venta.php?id=${id}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        alert("❌ " + data.error);
+        return;
+      }
+
+      // Llenar campos principales
+      document.getElementById("idCliente").value = data.idCliente;
+      document.getElementById("customer").value = data.productos[0].nombreCliente || "";
+      document.getElementById("date").value = data.fechaEmision;
+      document.getElementById("payment-method").value = data.metodoPago;
+      document.getElementById("status").value = data.estado;
+      document.getElementById("notes").value = data.comentarios;
+      document.getElementById("grand-total").textContent = data.total;
+      document.getElementById("grand-total-input").value = data.total;
+
+      // Limpiar tabla de productos
+      const tabla = document.querySelector("#sale-items tbody");
+      tabla.innerHTML = "";
+
+      data.productos.forEach((producto) => {
+        const row = document.createElement("tr");
+        row.classList.add("border-b");
+        row.innerHTML = `
+          <td class="p-2">
+            <select name="product[]" class="product-select w-full rounded-md border border-purple-100 px-2 py-1 text-sm focus:border-purple-500 focus:outline-none">
+              <option value="${producto.idProducto}" selected>${producto.nombreProducto}</option>
+            </select>
+            <input type="hidden" class="item-stock-hidden" name="stock[]" value="${producto.stock}">
+          </td>
+          <td class="p-2">
+            <input type="text" name="price[]" class="item-price w-full rounded-md border border-purple-100 px-2 py-1 text-sm focus:border-purple-500 focus:outline-none" value="${
+              producto.precioUnitario
+            }" readonly>
+          </td>
+          <td class="p-2">
+            <input type="number" name="quantity[]" min="1" class="item-quantity w-full rounded-md border border-purple-100 px-2 py-1 text-sm focus:border-purple-500 focus:outline-none" value="${
+              producto.cantidad
+            }">
+          </td>
+          <td class="p-2">
+            <input type="text" name="total[]" class="item-total w-full rounded-md border border-purple-100 px-2 py-1 text-sm focus:border-purple-500 focus:outline-none" value="${(
+              producto.precioUnitario * producto.cantidad
+            ).toFixed(2)}" readonly>
+          </td>
+          <td class="p-2">
+            <button type="button" class="remove-item rounded-md p-1 text-purple-500 hover:bg-red-50">
+              <i class="fas fa-times"></i>
+            </button>
+          </td>
+        `;
+        tabla.appendChild(row);
+      });
+
+      // Mostrar el modal
+      document.getElementById("modal-editar-venta").classList.remove("hidden");
+    })
+    .catch((err) => {
+      console.error("Error al cargar venta:", err);
+    });
+}
