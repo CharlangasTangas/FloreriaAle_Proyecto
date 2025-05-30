@@ -9,7 +9,7 @@ $sql->execute();
 $result = $sql->get_result();
 
 while ($row = $result->fetch_assoc()) {
-    $id = $row['idCliente'];
+    $id = $row['idCliente']; // <- aquí corriges 'idCLiente' a 'idCliente'
     $nombreCompleto = htmlspecialchars($row['nombre'] . ' ' . $row['apellidoPaterno'] . ' ' . $row['apellidoMaterno']);
     echo "<div class='opcion-cliente p-2 hover:bg-gray-200 cursor-pointer rounded-md border border-purple-100 px-3 py-2 focus:border-purple-500 focus:outline-none' data-id='$id'>$nombreCompleto</div>";
 }

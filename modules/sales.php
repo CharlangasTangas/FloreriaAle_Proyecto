@@ -28,11 +28,19 @@ include 'config/connection.php';
                     <input type="hidden" name="action" value="create_sale">
                     
                     <div class="mb-4 grid grid-cols-2 gap-4">
-                        <div>
+                        <div class="relative">
                             <label for="customer" class="mb-1 block text-sm font-medium text-purple-800">Cliente</label>
-                            <input type="text" id="customer" name="customer" class="w-full rounded-md border border-purple-100 px-3 py-2 focus:border-purple-500 focus:outline-none" placeholder="Nombre de Cliente">
-                            <div id="sugerencias" class=""></div>
+                            <input type="text" id="customer" name="customer" autocomplete="off"
+                                class="w-full rounded-md border border-purple-100 px-3 py-2 focus:border-purple-500 focus:outline-none"
+                                placeholder="Nombre de Cliente">
+                            <input type="hidden" id="idCliente" name="idCliente">
+
+                            <div id="sugerencias"
+                                class="absolute z-50 bg-white border border-purple-200 rounded-md mt-1 w-full max-h-48 overflow-y-auto hidden shadow-lg">
+                            </div>
                         </div>
+
+
                         <div>
                             <label for="date" class="mb-1 block text-sm font-medium text-purple-800 ">Fecha</label>
                             <input type="date" id="date" name="date" class="w-full rounded-md border border-purple-100 px-3 py-2 focus:border-purple-500 focus:outline-none" value="<?php echo date('Y-m-d'); ?>">
@@ -71,7 +79,6 @@ include 'config/connection.php';
                                                     }
                                                 ?>
                                             </select>
-                                            <input type="hidden" name="idCliente" id="idCliente" value="">
                                             <input type="hidden" class="item-stock-hidden" name="stock[]">
                                         </td>
                                         <td class="p-2">
@@ -98,10 +105,6 @@ include 'config/connection.php';
                     </div>
                     
                     <div class="mb-4 grid grid-cols-2 gap-4">
-
-                        <!-- Campo oculto para cliente (puede ser null) -->
-                        <input type="hidden" name="idCliente" id="idCliente" value="">
-                        
 
                         <?php if (isset($_SESSION['idEmpleado'])): ?>
                             <input type="hidden" name="idEmpleado" value="<?php echo $_SESSION['idEmpleado']; ?>">
@@ -180,7 +183,7 @@ include 'config/connection.php';
                     <input type="text" id="sale-search" placeholder="Buscar ventas" class="w-full rounded-md border border-purple-300 px-3 py-2 focus:border-purple-500 focus:outline-none">
                 </div>
                 <div class="rounded-md border border-purple-100">
-                    <table class="w-full">
+                    <table id="tabla-ventas" class="w-full">
                         <thead>
                             <tr class="border-b bg-purple-50">
                                 <th class="p-3 text-left font-medium text-purple-800">Id</th>
@@ -191,24 +194,8 @@ include 'config/connection.php';
                                 <th class="p-3 text-left font-medium text-purple-800">Estado</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php foreach ($sales as $sale): ?>
-                            <tr class="border-b">
-                                <td class="p-3 font-medium">
-                                    <a href="?page=invoices&id=<?php echo $sale['id']; ?>" class="text-purple-500 hover:underline">
-                                        <?php echo $sale['invoice']; ?>
-                                    </a>
-                                </td>
-                                <td class="p-3"><?php echo $sale['customer']; ?></td>
-                                <td class="p-3"><?php echo $sale['date']; ?></td>
-                                <td class="p-3">$<?php echo number_format($sale['total'], 2); ?></td>
-                                <td class="p-3">
-                                    <span class="rounded-full px-2 py-1 text-xs font-medium <?php echo $sale['status'] === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'; ?>">
-                                        <?php echo $sale['status']; ?>
-                                    </span>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
+                        <tbody id="ventas-recientes-body">
+                            <tr><td colspan="6" class="text-center p-4 text-gray-500">Cargando ventas...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -221,3 +208,5 @@ include 'config/connection.php';
 </div>
 
 <script src="assets/js/sales.js"></script>
+<script src="assets/js/recent_sales.js"></script>
+

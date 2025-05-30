@@ -22,8 +22,9 @@
                 </a>
             </div>
             <div class="flex items-center">
+                <!-- Botón de notificaciones -->
                 <button id="toggleNotifications"
-                    class="p-2 mr-1 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-gray-300">
+                    class="p-2 mr-1 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 focus:ring-4 focus:ring-gray-300 relative">
                     <span class="sr-only">View notifications</span>
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path
