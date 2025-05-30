@@ -12,11 +12,41 @@ $facturas = [];
 while ($fila = $resultado->fetch_assoc()) {
     $facturas[] = $fila;
 }
+$facturasCompra = [];
+$resultadoCompra = $connection->query("
+    SELECT fp.*, p.nombre AS proveedorNombre
+    FROM FacturaProveedor fp
+    JOIN Proveedor p ON fp.idProveedor = p.idProveedor
+");
 
-
+while ($fila = $resultadoCompra->fetch_assoc()) {
+    $facturasCompra[] = $fila;
+}
+$comprasDisponibles = [];
+$queryCompras = "
+    SELECT Compra.*, Proveedor.nombre AS proveedorNombre
+    FROM Compra
+    JOIN Proveedor ON Compra.idProveedor = Proveedor.idProveedor
+";
+$resultadoCompras = $connection->query($queryCompras);
+while ($fila = $resultadoCompras->fetch_assoc()) {
+    $comprasDisponibles[] = $fila;
+}
 // Procesar emisión de factura
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['emitirFactura'])) {
     $idVenta = intval($_POST['idVenta']);
+
+    // Verificar si ya existe una factura para esta venta
+    $verifica = $connection->prepare("SELECT COUNT(*) as total FROM FacturaCliente WHERE idVenta = ?");
+    $verifica->bind_param("i", $idVenta);
+    $verifica->execute();
+    $resultadoVerifica = $verifica->get_result();
+    $existeFactura = $resultadoVerifica->fetch_assoc();
+
+    if ($existeFactura['total'] > 0) {
+        echo "<script>alert('Ya existe una factura emitida para esta venta.'); window.location.href = window.location.href;</script>";
+        exit;
+    }
 
     // Obtener datos de la venta solo si está COMPLETADA
     $venta = $connection->query("SELECT * FROM Venta WHERE idVenta = $idVenta AND estado = 'Completed'")->fetch_assoc();
@@ -106,6 +136,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['cargarVenta'])) {
         exit;
     }
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['emitirFacturaCompra'])) {
+    $idCompra = intval($_POST['idCompra']);
+
+    $compra = $connection->query("SELECT * FROM Compra WHERE idCompra = $idCompra")->fetch_assoc();
+
+    if ($compra) {
+        $stmt = $connection->prepare("INSERT INTO FacturaProveedor (idCompra, idProveedor, subtotal, iva, total, fechaEmision) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param(
+            'iiddds',
+            $compra['idCompra'],
+            $compra['idProveedor'],
+            $compra['subtotal'],
+            $compra['iva'],
+            $compra['total'],
+            $compra['fechaCompra']
+        );
+        $stmt->execute();
+
+        echo "<script>alert('Factura de compra emitida exitosamente.'); window.location.href = window.location.href;</script>";
+        exit;
+    } else {
+        echo "<script>alert('No se puede emitir factura, compra no encontrada.'); window.location.href = window.location.href;</script>";
+        exit;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -129,49 +185,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['cargarVenta'])) {
     </div>
 
     <!-- Botón Emitir Factura -->
-<div class="flex justify-end mb-4">
-    <button onclick="openFacturaModal()" class="inline-flex items-center rounded-md bg-purple-700 px-4 py-2 text-white hover:bg-purple-800">
-        Emitir Factura
-    </button>
-</div>
+    <div class="flex justify-end mb-4">
+        <button onclick="openFacturaModal()" class="inline-flex items-center rounded-md bg-purple-700 px-4 py-2 text-white hover:bg-purple-800">
+            Emitir Factura
+        </button>
+    </div>
     <div class="bg-white p-4 rounded shadow">
        <table class="min-w-full">
-    <thead>
-        <tr class="bg-gray-100">
-            <th class="text-left p-2">Factura #</th>
-            <th class="text-left p-2">Cliente</th>
-            <th class="text-left p-2">Fecha Emisión</th>
-            <th class="text-left p-2">Venta ID</th>
-            <th class="text-left p-2">Total</th>
-            <th class="text-left p-2">Acciones</th> <!-- Nueva columna para el botón -->
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($facturas as $factura): ?>
-        <tr class="border-b">
-            <td class="p-2"><?= $factura['idFactura'] ?></td>
-            <td class="p-2">
-                <?= htmlspecialchars($factura['nombre'] . ' ' . $factura['apellidoPaterno'] . ' ' . $factura['apellidoMaterno']) ?>
-            </td>
-            <td class="p-2"><?= $factura['fechaEmision'] ?></td>
-            <td class="p-2"><?= $factura['idVenta'] ?></td>
-            <td class="p-2">$<?= number_format($factura['total'], 2) ?></td>
-            <td class="p-2">
-                <a href="modules/descargarFacturas.php?idFactura=<?= $factura['idFactura'] ?>" 
-                   target="_blank"
-                   class="bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700">
-                   Ver / Descargar PDF
-                </a>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="text-left p-2">Factura #</th>
+                    <th class="text-left p-2">Cliente</th>
+                    <th class="text-left p-2">Fecha Emisión</th>
+                    <th class="text-left p-2">Venta ID</th>
+                    <th class="text-left p-2">Total</th>
+                    <th class="text-left p-2">Acciones</th> <!-- Nueva columna para el botón -->
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($facturas as $factura): ?>
+                <tr class="border-b">
+                    <td class="p-2"><?= $factura['idFactura'] ?></td>
+                    <td class="p-2">
+                        <?= htmlspecialchars($factura['nombre'] . ' ' . $factura['apellidoPaterno'] . ' ' . $factura['apellidoMaterno']) ?>
+                    </td>
+                    <td class="p-2"><?= $factura['fechaEmision'] ?></td>
+                    <td class="p-2"><?= $factura['idVenta'] ?></td>
+                    <td class="p-2">$<?= number_format($factura['total'], 2) ?></td>
+                    <td class="p-2">
+                        <div class="flex justify-center gap-2">
+                        <a href="modules/descargarFacturas.php?idFactura=<?= $factura['idFactura'] ?>" 
+                        target="_blank"
+                        class="bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700">
+                        Ver / Descargar PDF
+                        </a>
+                         </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+     </div>
+     <div class="bg-white p-4 rounded shadow mt-6">
+    <h2 class="text-2xl font-bold mb-4">Facturas de Compras</h2>
 
-    </div>
+    <table class="min-w-full">
+        <tbody>
+            <tr>
+                <td class="p-4">
+                    <div class="flex justify-end">
+                        <button onclick="openCompraModal()" class="inline-flex items-center rounded-md bg-purple-700 px-4 py-2 text-white hover:bg-purple-800">
+                            Emitir Factura de Compra
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table class="min-w-full border rounded shadow">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="text-left p-2">Factura #</th>
+                                <th class="text-left p-2">Proveedor</th>
+                                <th class="text-left p-2">Fecha Emisión</th>
+                                <th class="text-left p-2">Compra ID</th>
+                                <th class="text-left p-2">Total</th>
+                                <th class="text-left p-2">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($facturasCompra as $factura): ?>
+                            <tr class="border-b">
+                                <td class="p-2"><?= $factura['idFactura'] ?></td>
+                                <td class="p-2"><?= htmlspecialchars($factura['proveedorNombre']) ?></td>
+                                <td class="p-2"><?= $factura['fechaEmision'] ?></td>
+                                <td class="p-2"><?= $factura['idCompra'] ?></td>
+                                <td class="p-2">$<?= number_format($factura['total'], 2) ?></td>
+                                <td class="p-2">
+                                    <div class="flex justify-center gap-2">
+                                    <a href="modules/descargarFacturas.php?idFactura=<?= $factura['idFactura'] ?>&tipo=compra" target="_blank"
+                                        class="bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700">
+                                        Ver / Descargar PDF
+                                    </a>
+                                </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 
     <!-- Modal para emitir factura -->
-<div id="facturaModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+    <div id="facturaModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-xl font-semibold">Emitir Factura</h3>
@@ -203,7 +312,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['cargarVenta'])) {
         </form>
     </div>
 </div>
+<!-- Modal para emitir factura de compra -->
+<div id="compraModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold">Emitir Factura de Compra</h3>
+            <button onclick="closeCompraModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
 
+        <form method="POST" action="">
+            <label for="idCompra" class="block font-medium mb-1">Seleccionar ID de Compra:</label>
+            <select name="idCompra" id="idCompra" class="w-full border rounded px-3 py-2 mb-4">
+                <option value="">-- Seleccionar --</option>
+                <?php foreach ($comprasDisponibles as $compra): ?>
+                    <option value="<?= $compra['idCompra'] ?>">
+                        <?= $compra['idCompra'] ?> - <?= $compra['proveedorNombre'] ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <div id="compraDetalles" class="text-sm text-gray-700">
+                <!-- Aquí se carga la información dinámica de la compra -->
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button type="submit" name="emitirFacturaCompra" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Confirmar y Emitir
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    $('#idCompra').select2({
+        placeholder: "Buscar por ID o nombre del proveedor",
+        allowClear: true
+    });
+});
+</script>
 
     <script>
 function openFacturaModal() {
@@ -253,7 +400,36 @@ $(document).ready(function() {
 });
 </script>
 
+<script>
+function openCompraModal() {
+    document.getElementById('compraModal').classList.remove('hidden');
+}
+</script>
+<script>
+function closeCompraModal() {
+    document.getElementById('compraModal').classList.add('hidden');
+    document.getElementById('compraDetalles').innerHTML = '';
+}
+</script>
+<script>
+function cargarDatosCompra(idCompra) {
+    if (!idCompra) return;
 
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "facturasCompra.php?cargarCompra=" + idCompra, true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            document.getElementById("compraDetalles").innerHTML = xhr.responseText;
+        }
+    };
+    xhr.send();
+}
+
+document.getElementById('idCompra').addEventListener('change', function () {
+    cargarDatosCompra(this.value);
+});
+
+</script>
 
 </body>
 </html>

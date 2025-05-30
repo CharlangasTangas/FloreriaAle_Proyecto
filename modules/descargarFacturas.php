@@ -2,29 +2,61 @@
 include '../config/connection.php';
 
 $idFactura = $_GET['idFactura'] ?? null;
+$tipo = $_GET['tipo'] ?? 'cliente'; // Por defecto: cliente
 
 if (!$idFactura) {
     die("Factura no especificada.");
 }
 
-$queryFactura = "
-SELECT f.*, c.nombre, c.apellidoPaterno, c.apellidoMaterno, c.RFC, v.fechaEmision AS fechaVenta
-FROM FacturaCliente f
-JOIN Cliente c ON f.idCliente = c.idCliente
-JOIN Venta v ON f.idVenta = v.idVenta
-WHERE f.idFactura = $idFactura
-";
+if ($tipo === 'cliente') {
+    $queryFactura = "
+        SELECT f.*, c.nombre, c.apellidoPaterno, c.apellidoMaterno, c.RFC, v.fechaEmision AS fechaEmision
+        FROM FacturaCliente f
+        JOIN Cliente c ON f.idCliente = c.idCliente
+        JOIN Venta v ON f.idVenta = v.idVenta
+        WHERE f.idFactura = $idFactura
+    ";
+    $factura = $connection->query($queryFactura)->fetch_assoc();
 
-$factura = $connection->query($queryFactura)->fetch_assoc();
+    $queryDetalles = "
+        SELECT d.*, p.nombre AS producto
+        FROM DetalleVenta d
+        JOIN Producto p ON d.idProducto = p.idProducto
+        WHERE d.idVenta = {$factura['idVenta']}
+    ";
+    $detalles = $connection->query($queryDetalles);
 
-$queryDetalles = "
-SELECT d.*, p.nombre AS producto
-FROM DetalleVenta d
-JOIN Producto p ON d.idProducto = p.idProducto
-WHERE d.idVenta = {$factura['idVenta']}
-";
+    $nombreCompleto = trim("{$factura['nombre']} {$factura['apellidoPaterno']} {$factura['apellidoMaterno']}");
+    $fechaEmision = $factura['fechaEmision'];
+    $rfc = $factura['RFC'];
+    $titulo = "Cliente";
 
-$detalles = $connection->query($queryDetalles);
+} else if ($tipo === 'compra') {
+    $queryFactura = "
+        SELECT f.*, p.nombre AS nombreProveedor, p.apellidoPaterno, p.apellidoMaterno, p.RFC, cp.fechaCompra AS fechaEmision
+        FROM FacturaProveedor f
+        JOIN Proveedor p ON f.idProveedor = p.idProveedor
+        JOIN Compra cp ON f.idCompra = cp.idCompra
+        WHERE f.idFactura = $idFactura
+    ";
+    $factura = $connection->query($queryFactura)->fetch_assoc();
+
+    $queryDetalles = "
+        SELECT dc.*, pr.nombre AS producto
+        FROM DetalleCompra dc
+        JOIN Producto pr ON dc.idProducto = pr.idProducto
+        WHERE dc.idCompra = {$factura['idCompra']}
+    ";
+    $detalles = $connection->query($queryDetalles);
+
+    $nombreCompleto = trim("{$factura['nombreProveedor']} {$factura['apellidoPaterno']} {$factura['apellidoMaterno']}");
+    $fechaEmision = $factura['fechaEmision'];
+    $rfc = $factura['RFC'];
+    $titulo = "Proveedor";
+
+} else {
+    die("Tipo de factura no válido.");
+}
 ?>
 
 <!DOCTYPE html>
@@ -106,13 +138,13 @@ $detalles = $connection->query($queryDetalles);
 <body>
     <div class="factura-container">
         <h2>Florería Ale</h2>
-        <h4>Factura Fiscal</h4>
+        <h4>Factura Fiscal <?= $titulo ?></h4>
 
         <div class="info">
             <strong>Folio:</strong> <?= $factura['idFactura'] ?><br>
-            <strong>Fecha:</strong> <?= $factura['fechaEmision'] ?><br>
-            <strong>Cliente:</strong> <?= "{$factura['nombre']} {$factura['apellidoPaterno']} {$factura['apellidoMaterno']}" ?><br>
-            <strong>RFC:</strong> <?= $factura['RFC'] ?>
+            <strong>Fecha:</strong> <?= $fechaEmision ?><br>
+            <strong><?= $titulo ?>:</strong> <?= $nombreCompleto ?><br>
+            <strong>RFC:</strong> <?= $rfc ?>
         </div>
 
         <table>
@@ -157,4 +189,3 @@ $detalles = $connection->query($queryDetalles);
     </div>
 </body>
 </html>
-
