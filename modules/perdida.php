@@ -134,8 +134,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -149,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background:  #f5f7fa ;
             min-height: 100vh;
             padding: 20px;
         }
@@ -160,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background:  #764ba2 100%;
             color: white;
             padding: 40px;
             border-radius: 15px;
@@ -238,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #764ba2 100%;
             color: white;
         }
 
@@ -248,7 +246,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            background:  #ee5a24 100%;
             color: white;
             padding: 6px 12px;
             font-size: 14px;
@@ -276,7 +274,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background:  #764ba2 100%;
             color: white;
             padding: 25px;
             border-radius: 15px;
@@ -311,7 +309,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
         }
 
         thead {
-            background: #f8f9fa;
+            background:rgba(182, 130, 192, 0.45);
         }
 
         th, td {
@@ -495,7 +493,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
         }
     </style>
 </head>
-<body>
+
     <div class="container">
         <div class="header">
             <h1>🌸 Pérdidas</h1>
@@ -628,7 +626,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
 
             <div class="form-group">
                 <label for="razon">Razón:</label>
-                <textarea id="razon" name="razon" rows="3" placeholder="¿Por qué es una pérdida?" required></textarea>
+                <textarea id="razon" name="razon" rows="3" placeholder="Daño. Robo. Vencimiento. Otro." required></textarea>
             </div>
 
             <div class="form-group">
@@ -666,6 +664,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['action']) && $_POST['
         localStorage.removeItem('perdidaRegistrada');
     }
 });
+
+document.getElementById('searchInput').addEventListener('input', function () {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#perdidasTable tr');
+
+    rows.forEach(row => {
+        const idPerdida = row.cells[0]?.textContent.toLowerCase() || '';
+        const nombreEmpleado = row.cells[1]?.textContent.toLowerCase() || '';
+
+        if (idPerdida.includes(filter) || nombreEmpleado.includes(filter)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+document.getElementById('searchInput').addEventListener('input', function () {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#perdidasTable tr');
+
+    rows.forEach(row => {
+        const idPerdida = row.cells[0]?.textContent.toLowerCase() || '';
+        const nombreEmpleado = row.cells[1]?.textContent.toLowerCase() || '';
+
+        if (idPerdida.includes(filter) || nombreEmpleado.includes(filter)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
 </script>
-</body>
-</html>

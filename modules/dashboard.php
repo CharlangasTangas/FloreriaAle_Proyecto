@@ -71,7 +71,7 @@ $connection->close();
 <div class="flex flex-col gap-6 max-w-7xl mx-auto px-4 py-8">
     
     <div>
-        <h2 class="text-2xl font-bold tracking-tight">Dashboard</h2>
+        <h2 class="text-2xl font-bold tracking-tight">Estadísticas.</h2>
         <p class="text-gray-500">Resumen del rendimiento de ventas y compras.</p>
     </div>
 
@@ -129,7 +129,7 @@ $connection->close();
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <div class="rounded-lg border bg-white shadow lg:col-span-7">
             <div class="flex justify-between p-4">
-                <h3 class="font-medium">Ventas por Mes (Demo)</h3>
+                <h3 class="font-medium">Ventas por Mes.</h3>
                 <i class="fas fa-chart-line text-gray-500"></i>
             </div>
             <div class="p-4 pt-0">
