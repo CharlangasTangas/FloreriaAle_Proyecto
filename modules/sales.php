@@ -191,12 +191,15 @@ include 'config/connection.php';
                                 <th class="p-3 text-left font-medium text-purple-800">Cliente</th>
                                 <th class="p-3 text-left font-medium text-purple-800">Fecha</th>
                                 <th class="p-3 text-left font-medium text-purple-800">Total</th>
-                                <th class="p-3 text-left font-medium text-purple-800">Estado</th>
+                                <th class="p-3 text-left font-medium text-purple-800">Acción</th> <!-- ESTA COLUMNA ES CLAVE -->
                             </tr>
                         </thead>
-                        <tbody id="ventas-recientes-body">
+
+                        <tbody id="ventas-tbody">
                             <tr><td colspan="6" class="text-center p-4 text-gray-500">Cargando ventas...</td></tr>
                         </tbody>
+
+
                     </table>
                 </div>
                 <div class="mt-4 text-right">
@@ -204,9 +207,119 @@ include 'config/connection.php';
                 </div>
             </div>
         </div>
+
+        <!-- Modal Editar Venta -->
+        <div id="modal-editar-venta" class="fixed inset-0 hidden z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-2xl p-6 shadow-xl w-full max-w-4xl overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-purple-800">✏️ Editar Venta</h2>
+            <button onclick="cerrarModalEditarVenta()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <form id="form-editar-venta">
+            <input type="hidden" name="idVenta" id="edit-idVenta">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                <label class="block text-sm font-medium text-purple-800">Cliente</label>
+                <input type="text" id="edit-cliente" class="w-full rounded-md border border-purple-200 px-3 py-2 bg-gray-100" readonly>
+                </div>
+                <div>
+                <label class="block text-sm font-medium text-purple-800">Fecha</label>
+                <input type="date" id="edit-fecha" name="fecha" class="w-full rounded-md border border-purple-200 px-3 py-2">
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-purple-800 mb-1">Productos</label>
+                <table class="w-full border border-purple-100 rounded-md" id="edit-productos-table">
+                <thead class="bg-purple-50">
+                    <tr>
+                    <th class="p-2 text-left text-sm">Producto</th>
+                    <th class="p-2 text-left text-sm">Precio</th>
+                    <th class="p-2 text-left text-sm">Cantidad</th>
+                    <th class="p-2 text-left text-sm">Total</th>
+                    <th class="p-2"></th>
+                    </tr>
+                </thead>
+                <tbody id="edit-productos-body">
+                    <!-- Filas se cargan dinámicamente -->
+                </tbody>
+                <tr id="edit-product-template" class="hidden">
+                <td class="p-2">
+                    <select name="edit-product[]" class="product-select w-full rounded-md border px-2 py-1 text-sm">
+                    <option value="">Seleccionar</option>
+                    <?php
+                        $sql = "SELECT idProducto, nombre, stock, precioVenta FROM Producto";
+                        $result = $connection->query($sql);
+                        while ($row = $result->fetch_assoc()) {
+                        echo "<option value=\"{$row['idProducto']}\" data-price=\"{$row['precioVenta']}\" data-stock=\"{$row['stock']}\">{$row['nombre']}</option>";
+                        }
+                    ?>
+                    </select>
+                    <input type="hidden" name="edit-stock[]" value="">
+                </td>
+                <td class="p-2">
+                    <input type="text" name="edit-price[]" class="item-price w-full rounded-md border px-2 py-1 text-sm" readonly>
+                </td>
+                <td class="p-2">
+                    <input type="number" name="edit-quantity[]" value="1" class="item-quantity w-full rounded-md border px-2 py-1 text-sm">
+                </td>
+                <td class="p-2">
+                    <input type="text" name="edit-total[]" class="item-total w-full rounded-md border px-2 py-1 text-sm" readonly>
+                </td>
+                <td class="p-2">
+                    <button type="button" class="remove-item text-red-500">✖</button>
+                </td>
+                </tr>
+
+                </table>
+                <button type="button" id="btn-agregar-producto-edit" class="mt-2 px-3 py-1 border border-purple-300 rounded-md text-sm hover:bg-purple-50">
+                Agregar producto
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                <label class="block text-sm font-medium text-purple-800">Método de Pago</label>
+                <select id="edit-metodo" name="metodo" class="w-full rounded-md border border-purple-300 px-3 py-2">
+                    <option value="Cash">Efectivo</option>
+                    <option value="Credit Card">Crédito</option>
+                    <option value="Debit Card">Débito</option>
+                    <option value="Other">Otro</option>
+                </select>
+                </div>
+                <div>
+                <label class="block text-sm font-medium text-purple-800">Estado</label>
+                <select id="edit-estado" name="estado" class="w-full rounded-md border border-purple-300 px-3 py-2">
+                    <option value="Pending">Pendiente</option>
+                    <option value="Completed">Completado</option>
+                </select>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-purple-800">Comentarios</label>
+                <textarea id="edit-comentarios" name="comentarios" rows="3" class="w-full rounded-md border border-purple-300 px-3 py-2"></textarea>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <div class="font-bold text-purple-800 text-lg">
+                Total: $<span id="edit-total">0.00</span>
+                </div>
+                <button type="submit" class="bg-purple-700 text-white font-semibold px-4 py-2 rounded-md hover:bg-purple-600">
+                Guardar cambios
+                </button>
+            </div>
+            </form>
+        </div>
+        </div>
+
+
+
+
+        
     </div>
 </div>
 
-<script src="assets/js/sales.js"></script>
-<script src="assets/js/recent_sales.js"></script>
+<script src="assets/js/sales/sales.js"></script>
+<script src="assets/js/sales/recent_sales.js"></script>
 

@@ -97,17 +97,7 @@
 
                 </ul>
                 <ul class="pt-4 mt-4 space-y-2">
-
-                    <!-- A J U S T E S -->
-                    <li>
-                        <a href="?page=test"
-                            class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group">
-                            <i
-                                class="fas fa-cog w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900"></i>
-                            <span class="ml-3">Ajustes</span>
-                        </a>
-                    </li>
-
+                    
                     <!-- C E R R A R  S E S I Ó N -->
 
                     <li>
