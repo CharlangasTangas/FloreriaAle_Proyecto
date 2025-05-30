@@ -71,37 +71,37 @@ $connection->close();
 <div class="flex flex-col gap-6 max-w-7xl mx-auto px-4 py-8">
     
     <div>
-        <h2 class="text-2xl font-bold tracking-tight">Estadísticas.</h2>
+        <h2 class="text-purple-950 text-2xl font-bold tracking-tight">Estadísticas.</h2>
         <p class="text-gray-500">Resumen del rendimiento de ventas y compras.</p>
     </div>
 
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-lg border bg-white shadow">
             <div class="flex justify-between p-4 pb-2">
-                <h3 class="text-sm font-medium">Ventas del Mes</h3>
-                <i class="fas fa-dollar-sign text-gray-500"></i>
+                <h3 class="text-purple-800 text-sm font-medium">Ventas del Mes</h3>
+                <i class="fas fa-dollar-sign text-purple-500"></i>
             </div>
             <div class="p-4 pt-0">
-                <div class="text-2xl font-bold">$<?= number_format($ventasMes, 2) ?></div>
+                <div class="text-purple-950 text-2xl font-bold">$<?= number_format($ventasMes, 2) ?></div>
             </div>
         </div>
         <div class="rounded-lg border bg-white shadow">
             <div class="flex justify-between p-4 pb-2">
-                <h3 class="text-sm font-medium">Compras del Mes</h3>
-                <i class="fas fa-shopping-cart text-gray-500"></i>
+                <h3 class="text-purple-800 text-sm font-medium">Compras del Mes</h3>
+                <i class="fas fa-shopping-cart text-purple-500"></i>
             </div>
             <div class="p-4 pt-0">
-                <div class="text-2xl font-bold">$<?= number_format($comprasMes, 2) ?></div>
+                <div class="text-purple-950 text-2xl font-bold">$<?= number_format($comprasMes, 2) ?></div>
             </div>
         </div>
         <div class="rounded-lg border bg-white shadow">
             <div class="flex justify-between p-4 pb-2">
-                <h3 class="text-sm font-medium">Empleado del Mes</h3>
-                <i class="fas fa-user-tie text-gray-500"></i>
+                <h3 class="text-purple-800 text-sm font-medium">Empleado del Mes</h3>
+                <i class="fas fa-user-tie text-purple-500"></i>
             </div>
             <div class="p-4 pt-0">
                 <?php if ($empleadoTop): ?>
-                    <div class="text-lg font-medium">
+                    <div class="text-purple-950 text-lg font-medium">
                         <?= $empleadoTop['nombre'] . ' ' . $empleadoTop['apellidoPaterno'] ?>
                     </div>
                     <div class="text-sm text-gray-500">Ventas: <?= $empleadoTop['total_ventas'] ?></div>
@@ -112,12 +112,12 @@ $connection->close();
         </div>
         <div class="rounded-lg border bg-white shadow">
             <div class="flex justify-between p-4 pb-2">
-                <h3 class="text-sm font-medium">Producto más Vendido</h3>
-                <i class="fas fa-box text-gray-500"></i>
+                <h3 class="text-purple-800 text-sm font-medium">Producto más Vendido</h3>
+                <i class="fas fa-box text-purple-500"></i>
             </div>
             <div class="p-4 pt-0">
                 <?php if ($productoTop): ?>
-                    <div class="text-lg font-medium"><?= $productoTop['nombre'] ?></div>
+                    <div class="text-purple-950 text-lg font-medium"><?= $productoTop['nombre'] ?></div>
                     <div class="text-sm text-gray-500">Vendidos: <?= $productoTop['total_vendido'] ?></div>
                 <?php else: ?>
                     <p>No hay ventas este mes.</p>
@@ -129,8 +129,8 @@ $connection->close();
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <div class="rounded-lg border bg-white shadow lg:col-span-7">
             <div class="flex justify-between p-4">
-                <h3 class="font-medium">Ventas por Mes.</h3>
-                <i class="fas fa-chart-line text-gray-500"></i>
+                <h3 class="text-purple-800 font-medium">Ventas por Mes.</h3>
+                <i class="fas fa-chart-line text-purple-500"></i>
             </div>
             <div class="p-4 pt-0">
                 <canvas id="salesChart" class="h-[300px] w-full"></canvas>
