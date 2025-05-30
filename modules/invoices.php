@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['emitirFacturaCompra']
 <body class="bg-gray-100 p-6">
 
     <div class="mb-6">
-        <h1 class="text-3xl font-bold">Facturas</h1>
+        <h1 class="text-purple-950 text-3xl font-bold">Facturas</h1>
         <p class="text-gray-600">Facturación de Florería Ale</p>
     </div>
 
@@ -190,16 +190,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['emitirFacturaCompra']
             Emitir Factura
         </button>
     </div>
-    <div class="bg-white p-4 rounded shadow">
-       <table class="min-w-full">
+    <div class="border-purple-100 bg-white p-4 rounded shadow">
+       <table class="min-w-full border-purple-100">
             <thead>
-                <tr class="bg-gray-100">
-                    <th class="text-left p-2">Factura #</th>
-                    <th class="text-left p-2">Cliente</th>
-                    <th class="text-left p-2">Fecha Emisión</th>
-                    <th class="text-left p-2">Venta ID</th>
-                    <th class="text-left p-2">Total</th>
-                    <th class="text-left p-2">Acciones</th> <!-- Nueva columna para el botón -->
+                <tr class="bg-purple-50">
+                    <th class="text-purple-950 text-left p-2">Factura #</th>
+                    <th class="text-purple-950 text-left p-2">Cliente</th>
+                    <th class="text-purple-950 text-left p-2">Fecha Emisión</th>
+                    <th class="text-purple-950 text-left p-2">Venta ID</th>
+                    <th class="text-purple-950 text-left p-2">Total</th>
+                    <th class="text-purple-950 text-left p-2">Acciones</th> <!-- Nueva columna para el botón -->
                 </tr>
             </thead>
             <tbody>
@@ -227,9 +227,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['emitirFacturaCompra']
         </table>
      </div>
      <div class="bg-white p-4 rounded shadow mt-6">
-    <h2 class="text-2xl font-bold mb-4">Facturas de Compras</h2>
+    <h2 class="text-purple-950 text-2xl font-bold mb-4">Facturas de Compras</h2>
 
-    <table class="min-w-full">
+    <table class="min-w-full border-purple-100">
         <tbody>
             <tr>
                 <td class="p-4">
@@ -244,13 +244,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['emitirFacturaCompra']
                 <td>
                     <table class="min-w-full border rounded shadow">
                         <thead>
-                            <tr class="bg-gray-100">
-                                <th class="text-left p-2">Factura #</th>
-                                <th class="text-left p-2">Proveedor</th>
-                                <th class="text-left p-2">Fecha Emisión</th>
-                                <th class="text-left p-2">Compra ID</th>
-                                <th class="text-left p-2">Total</th>
-                                <th class="text-left p-2">Acciones</th>
+                            <tr class="bg-purple-50">
+                                <th class="text-purple-950 text-left p-2">Factura #</th>
+                                <th class="text-purple-950 text-left p-2">Proveedor</th>
+                                <th class="text-purple-950 text-left p-2">Fecha Emisión</th>
+                                <th class="text-purple-950 text-left p-2">Compra ID</th>
+                                <th class="text-purple-950 text-left p-2">Total</th>
+                                <th class="text-purple-950 text-left p-2">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
