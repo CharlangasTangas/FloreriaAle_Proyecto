@@ -345,13 +345,13 @@ function openEditModal(cliente) {
             <div><label>Nombre:</label><input type="text" name="nombre" value="${cliente.nombre}" class="w-full border px-2 py-1" required></div>
             <div><label>Apellido Paterno:</label><input type="text" name="apellidoPaterno" value="${cliente.apellidoPaterno}" class="w-full border px-2 py-1" required></div>
             <div><label>Apellido Materno:</label><input type="text" name="apellidoMaterno" value="${cliente.apellidoMaterno}" class="w-full border px-2 py-1" required></div>
-            <div><label>RFC:</label><input type="text" name="rfc" value="${cliente.RFC}" class="w-full border px-2 py-1"></div>
-            <div><label>Teléfono:</label><input type="text" name="telefono" value="${cliente.telefono}" class="w-full border px-2 py-1"></div>
+            <div><label>RFC:</label><input type="text" name="rfc" maxlength="13" value="${cliente.RFC}" class="w-full border px-2 py-1"></div>
+            <div><label>Teléfono:</label><input type="text" maxlength="10" name="telefono" value="${cliente.telefono}" class="w-full border px-2 py-1"></div>
             <div><label>Email:</label><input type="email" name="email" value="${cliente.email}" class="w-full border px-2 py-1"></div>
             <div><label>Calle:</label><input type="text" name="calle" value="${cliente.calle}" class="w-full border px-2 py-1"></div>
-            <div><label>No. Casa:</label><input type="text" name="noCasa" value="${cliente.noCasa}" class="w-full border px-2 py-1"></div>
-            <div><label>Colonia:</label><input type="text" name="colonia" value="${cliente.colonia}" class="w-full border px-2 py-1"></div>
-            <div><label>CP:</label><input type="text" name="cp" value="${cliente.CP}" class="w-full border px-2 py-1"></div>
+            <div><label>No. Casa:</label><input type="text" name="noCasa" maxlength="5" value="${cliente.noCasa}" class="w-full border px-2 py-1"></div>
+            <div><label>Colonia:</label><input type="text" name="colonia"  value="${cliente.colonia}" class="w-full border px-2 py-1"></div>
+            <div><label>CP:</label><input type="text" name="cp" maxlength="5" value="${cliente.CP}" class="w-full border px-2 py-1"></div>
             <div><label>Ciudad:</label><input type="text" name="ciudad" value="${cliente.ciudad}" class="w-full border px-2 py-1"></div>
             <div><label>Estado:</label><input type="text" name="estado" value="${cliente.estado}" class="w-full border px-2 py-1"></div>
             <div>
@@ -382,13 +382,13 @@ function openRegisterModal() {
             <div><label>Nombre:</label><input type="text" name="nombre" class="w-full border px-2 py-1" required></div>
             <div><label>Apellido Paterno:</label><input type="text" name="apellidoPaterno" class="w-full border px-2 py-1" required></div>
             <div><label>Apellido Materno:</label><input type="text" name="apellidoMaterno" class="w-full border px-2 py-1" required></div>
-            <div><label>RFC:</label><input type="text" name="rfc" class="w-full border px-2 py-1"></div>
-            <div><label>Teléfono:</label><input type="text" name="telefono" class="w-full border px-2 py-1"></div>
+            <div><label>RFC:</label><input type="text" name="rfc" maxlength="13" class="w-full border px-2 py-1"></div>
+            <div><label>Teléfono:</label><input type="text" name="telefono" maxlength="10" class="w-full border px-2 py-1"></div>
             <div><label>Email:</label><input type="email" name="email" class="w-full border px-2 py-1"></div>
             <div><label>Calle:</label><input type="text" name="calle" class="w-full border px-2 py-1"></div>
-            <div><label>No. Casa:</label><input type="text" name="noCasa" class="w-full border px-2 py-1"></div>
+            <div><label>No. Casa:</label><input type="text" name="noCasa" maxlength="5" class="w-full border px-2 py-1"></div>
             <div><label>Colonia:</label><input type="text" name="colonia" class="w-full border px-2 py-1"></div>
-            <div><label>CP:</label><input type="text" name="cp" class="w-full border px-2 py-1"></div>
+            <div><label>CP:</label><input type="text" name="cp" maxlength="5" class="w-full border px-2 py-1"></div>
             <div><label>Ciudad:</label><input type="text" name="ciudad" class="w-full border px-2 py-1"></div>
             <div><label>Estado:</label><input type="text" name="estado" class="w-full border px-2 py-1"></div>
             <div>

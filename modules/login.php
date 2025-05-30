@@ -1,5 +1,5 @@
 <?php
-include 'config\connection.php';
+include '..\config\connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $usuario = $_POST['usuario'];
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['usuario'] = $usuarioData['usuario'];
             $_SESSION['nombre'] = $usuarioData['nombre'];
             $_SESSION['rol'] = $usuarioData['rol'];
-            header('Location: index.php');
+            header('Location: ..\index.php');
             exit();
         } else {
             $error = "Usuario o contraseña incorrectos";
