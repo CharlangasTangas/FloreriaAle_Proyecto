@@ -110,12 +110,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
 ?>
 
-<div class="flex flex-col gap-6">
-    <div>
-        <h2 class="text-2xl font-bold tracking-tight">User Management</h2>
-        <p class="text-gray-500">Create, view, update, and delete system users.</p>
-    </div>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -157,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     <h3 class="font-medium">Empleados</h3>
                     <p class="text-sm text-gray-500">Bienvenidos.</p>
                 </div>
-                <button type="button" class="inline-flex items-center rounded-md bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600" onclick="document.getElementById('add-user-modal').classList.remove('hidden')">
+                <button type="button" class="inline-flex items-center rounded-md bg-purple-700 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600" onclick="document.getElementById('add-user-modal').classList.remove('hidden')">
                     <i class="fas fa-plus-circle mr-2"></i>
                     Agregar empleado
                 </button>
