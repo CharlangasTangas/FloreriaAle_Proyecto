@@ -413,16 +413,6 @@
 
                         <!-- Divider mejorado -->
                         <div class="divider-enhanced mb-4"></div>
-
-                        <!-- Cerrar Sesión MEJORADO -->
-                        <li>
-                            <a href="modules/logout.php"
-                                class="logout-enhanced flex items-center p-2 text-base text-white text-enhanced rounded-lg group">
-                                <i class="fas fa-sign-out-alt w-6 h-6 text-white transition duration-75"></i>
-                                <span class="ml-3">Cerrar Sesión</span>
-                            </a>
-                        </li>
-
                     </ul>
                 </div>
             </div>

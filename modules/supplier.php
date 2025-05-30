@@ -256,9 +256,9 @@ function openEditModal(proveedor) {
             <div><label>Nombre:</label><input type="text" name="nombre" value="${proveedor.nombre}" class="w-full border px-2 py-1" required></div>
             <div><label>Apellido Paterno:</label><input type="text" name="apellidoPaterno" value="${proveedor.apellidoPaterno}" class="w-full border px-2 py-1" required></div>
             <div><label>Apellido Materno:</label><input type="text" name="apellidoMaterno" value="${proveedor.apellidoMaterno}" class="w-full border px-2 py-1" required></div>
-            <div><label>RFC:</label><input type="text" name="rfc" maxlength="13" value="${proveedor.RFC}" class="w-full border px-2 py-1"></div>
+            <div><label>RFC:</label><input type="text" name="rfc" maxlength="13" value="${proveedor.RFC}" class="w-full border px-2 py-1"required ></div>
             <div><label>Teléfono:</label><input type="text" name="telefono" maxlength="10" value="${proveedor.telefono}" class="w-full border px-2 py-1"></div>
-            <div><label>Email:</label><input type="email" name="email" value="${proveedor.email}" class="w-full border px-2 py-1"></div>
+            <div><label>Email:</label><input type="email" name="email" value="${proveedor.email}" class="w-full border px-2 py-1" required></div>
             <div><label>Calle:</label><input type="text" name="calle" value="${proveedor.calle}" class="w-full border px-2 py-1"></div>
             <div><label>No. Casa:</label><input type="text" maxlength="5" name="noCasa" value="${proveedor.noCasa}" class="w-full border px-2 py-1"></div>
             <div><label>Colonia:</label><input type="text" name="colonia" value="${proveedor.colonia}" class="w-full border px-2 py-1"></div>
@@ -286,9 +286,9 @@ function openRegisterModal() {
             <div><label>Nombre:</label><input type="text" name="nombre" class="w-full border px-2 py-1" required></div>
             <div><label>Apellido Paterno:</label><input type="text" name="apellidoPaterno" class="w-full border px-2 py-1" required></div>
             <div><label>Apellido Materno:</label><input type="text" name="apellidoMaterno" class="w-full border px-2 py-1" required></div>
-            <div><label>RFC:</label><input type="text" name="rfc" maxlength="13" class="w-full border px-2 py-1"></div>
+            <div><label>RFC:</label><input type="text" name="rfc" maxlength="13" class="w-full border px-2 py-1"required></div>
             <div><label>Teléfono:</label><input type="text" name="telefono" maxlength="10" class="w-full border px-2 py-1"></div>
-            <div><label>Email:</label><input type="email" name="email" class="w-full border px-2 py-1"></div>
+            <div><label>Email:</label><input type="email" name="email" class="w-full border px-2 py-1"required ></div>
             <div><label>Calle:</label><input type="text" name="calle" class="w-full border px-2 py-1"></div>
             <div><label>No. Casa:</label><input type="text" name="noCasa" maxlength="5" class="w-full border px-2 py-1"></div>
             <div><label>Colonia:</label><input type="text" name="colonia" class="w-full border px-2 py-1"></div>
